@@ -6,8 +6,6 @@ import 'package:vacation_ownership_advisor/repository/appurl.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
-// ignore_for_file: prefer_final_fields
-String? contactId;
 String? id;
 String? token;
 
@@ -32,33 +30,6 @@ class TabsScreenAuth {
       if (kDebugMode) {
         print(e);
       }
-    }
-  }
-
-// search contact id
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        contactId = data['data'][0]['id'];
-
-        log("ContactId  : $contactId");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
     }
   }
 
@@ -488,11 +459,6 @@ class TabsScreenAuth {
         log("error : $e");
       }
     }
-  }
-
-// get contactId method
-  String? getContactMethod() {
-    return contactId;
   }
 
   // get contactCreateId method

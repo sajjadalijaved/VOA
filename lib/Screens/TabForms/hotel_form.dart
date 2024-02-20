@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart';
 import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +36,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   String? id;
   String? getContact;
   String? getContactCreatId;
+  late String getContactCreatId1;
 
   DateTime? _checkInDate;
   DateTime? _checkOutDate;
@@ -160,9 +163,98 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     }
   }
 
+  Future getContactIdMethod({required String email}) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Zoho-oauthtoken $token",
+        "orgId": "753177605"
+      };
+
+      var response = await get(
+          Uri.parse(
+              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        log("Get ContactId Data : $data");
+        getContact = data['data'][0]['id'];
+
+        log("ContactId  : $getContact");
+      } else {
+        log("response statusCode :${response.statusCode}");
+      }
+    } catch (e) {
+      log("err0r : $e");
+    }
+  }
+
+  // contactId get through sharePreferences
+  Future<String> contactIdRetriever() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String id = prefs.getString('contactId') ?? '';
+    return id;
+  }
+
   @override
   void initState() {
     super.initState();
+
+    if (widget.userId == null || widget.userId.isEmpty) {
+      splashServices.updateDataToDataBase(context).whenComplete(() {
+        fetch();
+      }).whenComplete(() async {
+        // accessToken method call
+        await tabsScreenAuth.tabsScreensAccessToken();
+      }).whenComplete(() async {
+        await getContactIdMethod(email: email!);
+      }).whenComplete(() async {
+        if (getContact == null) {
+          await tabsScreenAuth.contactCreateMethod(
+            email: email.toString(),
+            firstname: firstName.toString(),
+            mobile: phoneNumber.toString(),
+          );
+          log("New Recorde Add:");
+        } else {
+          log("Recorde already exists:");
+        }
+      }).whenComplete(() {
+        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("get id from create method in hotel Screen:$getContactCreatId");
+      }).whenComplete(() async {
+        await contactIdSaver(getContactCreatId == null
+            ? getContact!.toString()
+            : getContactCreatId!.toString());
+      });
+    } else {
+      splashServices.sendUserDataToDataBase(context).whenComplete(() {
+        fetch();
+      }).whenComplete(() async {
+        // accessToken method call
+        await tabsScreenAuth.tabsScreensAccessToken();
+      }).whenComplete(() async {
+        await getContactIdMethod(email: email!);
+      }).whenComplete(() async {
+        if (getContact == null) {
+          await tabsScreenAuth.contactCreateMethod(
+            email: email.toString(),
+            firstname: firstName.toString(),
+            mobile: phoneNumber.toString(),
+          );
+          log("New Recorde Add:");
+        } else {
+          log("Recorde already exists:");
+        }
+      }).whenComplete(() {
+        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("get id from create method in hotel Screen:$getContactCreatId");
+      }).whenComplete(() async {
+        await contactIdSaver(getContactCreatId == null
+            ? getContact!.toString()
+            : getContactCreatId!.toString());
+      });
+    }
 
     checkInDateController = TextEditingController();
     checkOutController = TextEditingController();
@@ -181,67 +273,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     // focus node
     checkInDate = FocusNode();
     checkOutDate = FocusNode();
-
-    if (widget.userId == null || widget.userId.isEmpty) {
-      splashServices.updateDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        // getEmail method call
-        getContact = tabsScreenAuth.getContactMethod();
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
-      });
-    } else {
-      splashServices.sendUserDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!.toString());
-      }).whenComplete(() {
-        getContact = tabsScreenAuth.getContactMethod();
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
-      });
-    }
   }
 
   @override

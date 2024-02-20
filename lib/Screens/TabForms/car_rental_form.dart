@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart';
 import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -190,6 +192,32 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     }
   }
 
+  Future getContactIdMethod({required String email}) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Zoho-oauthtoken $token",
+        "orgId": "753177605"
+      };
+
+      var response = await get(
+          Uri.parse(
+              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        log("Get ContactId Data : $data");
+        getContact = data['data'][0]['id'];
+
+        log("ContactId  : $getContact");
+      } else {
+        log("response statusCode :${response.statusCode}");
+      }
+    } catch (e) {
+      log("err0r : $e");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -218,13 +246,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        // getEmail method call
-        getContact = tabsScreenAuth.getContactMethod();
-        log("getContact method in hostel screen: $getContact");
-      }).whenComplete(() {
-        contactIdRetriever();
+        await getContactIdMethod(email: email!);
       }).whenComplete(() {
         contactIdRetriever();
       });
@@ -236,12 +258,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email.toString());
-      }).whenComplete(() {
-        getContact = tabsScreenAuth.getContactMethod();
-        log("getContact method in hostel screen $getContact");
-      }).whenComplete(() {
-        contactIdRetriever();
+        await getContactIdMethod(email: email!);
       }).whenComplete(() {
         contactIdRetriever();
       });

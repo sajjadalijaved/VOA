@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -144,6 +146,32 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
     }
   }
 
+  Future getContactIdMethod({required String email}) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Zoho-oauthtoken $token",
+        "orgId": "753177605"
+      };
+
+      var response = await get(
+          Uri.parse(
+              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        log("Get ContactId Data : $data");
+        getContact = data['data'][0]['id'];
+
+        log("ContactId  : $getContact");
+      } else {
+        log("response statusCode :${response.statusCode}");
+      }
+    } catch (e) {
+      log("err0r : $e");
+    }
+  }
+
   // contactId get through sharePreferences
   contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -182,10 +210,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        // getEmail method call
-        getContact = tabsScreenAuth.getContactMethod();
+        await getContactIdMethod(email: email!);
       }).whenComplete(() {
         contactIdRetriever();
       });
@@ -197,9 +222,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email.toString());
-      }).whenComplete(() {
-        getContact = tabsScreenAuth.getContactMethod();
+        await getContactIdMethod(email: email.toString());
       }).whenComplete(() {
         contactIdRetriever();
       });

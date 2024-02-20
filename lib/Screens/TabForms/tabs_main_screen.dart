@@ -101,10 +101,11 @@ class _TabsMainScreenState extends State<TabsMainScreen>
           child: Flexible(
             child: TabBar(
                 indicatorSize: TabBarIndicatorSize.label,
+                isScrollable: true,
                 unselectedLabelColor: Colors.grey.shade600,
                 physics: const BouncingScrollPhysics(),
                 controller: _tabController,
-                tabAlignment: TabAlignment.fill,
+                tabAlignment: TabAlignment.start,
                 dividerColor: Colors.grey.shade500,
                 tabs: const [
                   FittedBox(

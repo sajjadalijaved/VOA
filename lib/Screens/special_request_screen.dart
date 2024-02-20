@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart';
 import '../modals/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +35,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
 
   String? getContact;
   String? getContactCreatId;
+  String? getContactCreatId1;
 
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
@@ -50,6 +53,32 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
     prefs.setString('contactId', id);
 
     return 'saved';
+  }
+
+  Future getContactIdMethod({required String email}) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Zoho-oauthtoken $token",
+        "orgId": "753177605"
+      };
+
+      var response = await get(
+          Uri.parse(
+              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        log("Get ContactId Data : $data");
+        getContact = data['data'][0]['id'];
+
+        log("ContactId  : $getContact");
+      } else {
+        log("response statusCode :${response.statusCode}");
+      }
+    } catch (e) {
+      log("err0r : $e");
+    }
   }
 
   // fetch data from database
@@ -77,6 +106,13 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
     }
   }
 
+  // contactId get through sharePreferences
+  Future<String> contactIdRetriever() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String id = prefs.getString('contactId') ?? '';
+    return id;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -90,10 +126,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        // getEmail method call
-        getContact = tabsScreenAuth.getContactMethod();
+        await getContactIdMethod(email: email!);
       }).whenComplete(() async {
         if (getContact == null) {
           await tabsScreenAuth.contactCreateMethod(
@@ -107,6 +140,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
         }
       }).whenComplete(() {
         getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("get id from create method in Special Screen:$getContactCreatId");
       }).whenComplete(() async {
         await contactIdSaver(getContactCreatId == null
             ? getContact!.toString()
@@ -120,9 +154,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
         await tabsScreenAuth.tabsScreensAccessToken();
       }).whenComplete(() async {
         // searchEmail method call
-        await tabsScreenAuth.getContactIdMethod(email: email!.toString());
-      }).whenComplete(() {
-        getContact = tabsScreenAuth.getContactMethod();
+        await getContactIdMethod(email: email!.toString());
       }).whenComplete(() async {
         if (getContact == null) {
           await tabsScreenAuth.contactCreateMethod(
@@ -136,6 +168,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
         }
       }).whenComplete(() {
         getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("get id from create method in Spleash Screen:$getContactCreatId");
       }).whenComplete(() async {
         await contactIdSaver(getContactCreatId == null
             ? getContact!.toString()

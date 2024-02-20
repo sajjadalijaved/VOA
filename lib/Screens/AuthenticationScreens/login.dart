@@ -256,6 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: width,
                         height: height * 0.06,
                         press: () {
+                          FocusScope.of(context).unfocus();
                           if (key.currentState!.validate()) {
                             Map data = {
                               'email': emailController.text.trim(),

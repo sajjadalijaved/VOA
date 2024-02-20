@@ -8,6 +8,7 @@ import '../../Utils/routes/routesname.dart';
 import '../../view_model/user_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Screens/CallScreens/mapscreen.dart';
 import 'package:vacation_ownership_advisor/Screens/special_request_screen.dart';
@@ -53,6 +54,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   dynamic currentBackPressTime;
+
+  Future<void> clearContactId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('contactId');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: const Text('Yes'),
                             onPressed: () {
                               setState(() {
+                                clearContactId();
                                 userPraferance.remove().then((value) {
                                   Navigator.pushNamedAndRemoveUntil(
                                       context,
