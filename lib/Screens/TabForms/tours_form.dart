@@ -8,6 +8,7 @@ import '../../view_model/error_controll_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/Utils/utils.dart';
 import 'package:vacation_ownership_advisor/modals/data_model.dart';
+import '../../view_model/textformfield_change_color_view_model.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
@@ -228,6 +229,8 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
         Provider.of<ErrorModelClass>(context, listen: false);
+    TextFieldColorChangeViewModel textFieldColorChangeViewModel =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -252,6 +255,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: typeofToursController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -281,6 +285,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: durationofTourController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -308,6 +313,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: nameofTourController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -336,22 +342,30 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                CustomTextField(
-                    onTap: () {
-                      if (context != null) {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                      }
-                      startDateMethod(context);
-                    },
-                    controller: startingDateController,
-                    focusNode: startDateFocusNode,
-                    inputparameter: [DateInputFormatter()],
-                    validate: (value) {
-                      return FieldValidator.validateDate(value);
-                    },
-                    sufixIcon: const Icon(Icons.calendar_today_sharp),
-                    hintText: "Enter Starting Date Of Tour",
-                    fieldValidationkey: startedDateFieldKey),
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => CustomTextField(
+                      boderColor: value.startDateFieldColor,
+                      onTap: () {
+                        value.setStartDateFieldColor(const Color(0xff0092ff));
+                        value.setEndingDateFieldColor(Colors.black26);
+                        if (context != null) {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        }
+                        startDateMethod(context);
+                      },
+                      controller: startingDateController,
+                      focusNode: startDateFocusNode,
+                      inputparameter: [DateInputFormatter()],
+                      validate: (value) {
+                        return FieldValidator.validateDate(value);
+                      },
+                      sufixIcon: Icon(
+                        Icons.calendar_today_sharp,
+                        color: value.startDateFieldColor,
+                      ),
+                      hintText: "Enter Starting Date Of Tour",
+                      fieldValidationkey: startedDateFieldKey),
+                ),
                 const SizedBox(
                   height: 6,
                 ),
@@ -369,32 +383,42 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 Consumer<ErrorModelClass>(
-                  builder: (context, value, child) => CustomTextField(
-                      onTap: () {
-                        if (_startingDate == null) {
-                          errorModelClass
-                              .setErrorText("First Fill Starting Date");
-                        } else {
-                          errorModelClass.setErrorText("");
-                        }
+                  builder: (context, value, child) =>
+                      Consumer<TextFieldColorChangeViewModel>(
+                    builder: (context, value, child) => CustomTextField(
+                        boderColor: value.endingDateFieldColor,
+                        onTap: () {
+                          value
+                              .setEndingDateFieldColor(const Color(0xff0092ff));
+                          value.setStartDateFieldColor(Colors.black26);
+                          if (_startingDate == null) {
+                            errorModelClass
+                                .setErrorText("First Fill Starting Date");
+                          } else {
+                            errorModelClass.setErrorText("");
+                          }
 
-                        if (context != null) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        }
-                        endingDateMethod(context);
-                      },
-                      controller: endingDateController,
-                      focusNode: endDateFocusNode,
-                      errorText: errorModelClass.errorText.isNotEmpty
-                          ? errorModelClass.errorText
-                          : null,
-                      sufixIcon: const Icon(Icons.calendar_today_sharp),
-                      inputparameter: [DateInputFormatter()],
-                      validate: (value) {
-                        return FieldValidator.validateDate(value);
-                      },
-                      hintText: "Enter Ending Date Of Tour",
-                      fieldValidationkey: endingDateFieldKey),
+                          if (context != null) {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          }
+                          endingDateMethod(context);
+                        },
+                        controller: endingDateController,
+                        focusNode: endDateFocusNode,
+                        errorText: errorModelClass.errorText.isNotEmpty
+                            ? errorModelClass.errorText
+                            : null,
+                        sufixIcon: Icon(
+                          Icons.calendar_today_sharp,
+                          color: value.endingDateFieldColor,
+                        ),
+                        inputparameter: [DateInputFormatter()],
+                        validate: (value) {
+                          return FieldValidator.validateDate(value);
+                        },
+                        hintText: "Enter Ending Date Of Tour",
+                        fieldValidationkey: endingDateFieldKey),
+                  ),
                 ),
                 const SizedBox(
                   height: 6,
@@ -413,6 +437,11 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    onTap: () {
+                      textFieldColorChangeViewModel
+                          .setEndingDateFieldColor(Colors.black26);
+                    },
+                    boderColor: const Color(0xff0092ff),
                     controller: numberofPeopleController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -440,6 +469,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: destinationofTourController,
                     inputAction: TextInputAction.next,
                     textCapitalization: TextCapitalization.words,
@@ -466,6 +496,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: preferredItineraryController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -495,6 +526,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: budgetController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -505,7 +537,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateBudgetPerNight(value);
                     },
-                    hintText: "Enter Budget Of Tour",
+                    hintText: "\$",
                     fieldValidationkey: budgetFieldKey),
                 const SizedBox(
                   height: 6,

@@ -8,6 +8,7 @@ import '../../view_model/services/splash_services.dart';
 import '../../view_model/error_controll_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/modals/data_model.dart';
+import '../../view_model/textformfield_change_color_view_model.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
@@ -259,6 +260,8 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
         Provider.of<ErrorModelClass>(context, listen: false);
     DropDownViewModel dropdownViewModel =
         Provider.of<DropDownViewModel>(context, listen: false);
+    TextFieldColorChangeViewModel textFieldColorChangeViewModel =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -315,7 +318,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                           filled: true,
                           contentPadding: const EdgeInsets.all(10),
                         ),
-                        value: dropdownViewModel.dropdownValue,
+                        value: value.dropdownValue,
                         isExpanded: true,
                         menuMaxHeight: 350,
                         items: [
@@ -358,6 +361,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: destinationController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -383,22 +387,30 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                CustomTextField(
-                    onTap: () {
-                      if (context != null) {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                      }
-                      sailingDateMethod(context);
-                    },
-                    controller: saillingDateController,
-                    inputparameter: [DateInputFormatter()],
-                    validate: (value) {
-                      return FieldValidator.validateDate(value);
-                    },
-                    sufixIcon: const Icon(Icons.calendar_today_sharp),
-                    focusNode: sailingDateFocusNode,
-                    hintText: "Enter Sailing Date",
-                    fieldValidationkey: saillingDateFieldKey),
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => CustomTextField(
+                      boderColor: value.sailingDateFieldColor,
+                      onTap: () {
+                        value.setSailingDateFieldColor(const Color(0xff0092ff));
+                        value.setReturnDateFieldColor(Colors.black26);
+                        if (context != null) {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        }
+                        sailingDateMethod(context);
+                      },
+                      controller: saillingDateController,
+                      inputparameter: [DateInputFormatter()],
+                      validate: (value) {
+                        return FieldValidator.validateDate(value);
+                      },
+                      sufixIcon: Icon(
+                        Icons.calendar_today_sharp,
+                        color: value.sailingDateFieldColor,
+                      ),
+                      focusNode: sailingDateFocusNode,
+                      hintText: "Enter Sailing Date",
+                      fieldValidationkey: saillingDateFieldKey),
+                ),
                 const SizedBox(
                   height: 6,
                 ),
@@ -416,32 +428,42 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 Consumer<ErrorModelClass>(
-                  builder: (context, value, child) => CustomTextField(
-                      onTap: () {
-                        if (_saillingDate == null) {
-                          errorModelClass
-                              .setErrorText("First Fill Sailing Date");
-                        } else {
-                          errorModelClass.setErrorText("");
-                        }
+                  builder: (context, value, child) =>
+                      Consumer<TextFieldColorChangeViewModel>(
+                    builder: (context, value, child) => CustomTextField(
+                        boderColor: value.returnDateFieldColor,
+                        onTap: () {
+                          value.setSailingDateFieldColor(Colors.black26);
+                          value
+                              .setReturnDateFieldColor(const Color(0xff0092ff));
+                          if (_saillingDate == null) {
+                            errorModelClass
+                                .setErrorText("First Fill Sailing Date");
+                          } else {
+                            errorModelClass.setErrorText("");
+                          }
 
-                        if (context != null) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        }
-                        returnDateMethod(context);
-                      },
-                      controller: returnDateController,
-                      errorText: errorModelClass.errorText.isNotEmpty
-                          ? errorModelClass.errorText
-                          : null,
-                      sufixIcon: const Icon(Icons.calendar_today_sharp),
-                      inputparameter: [DateInputFormatter()],
-                      validate: (value) {
-                        return FieldValidator.validateDate(value);
-                      },
-                      hintText: "Enter Return Date",
-                      focusNode: returnDateFocusNode,
-                      fieldValidationkey: returnDateFieldKey),
+                          if (context != null) {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          }
+                          returnDateMethod(context);
+                        },
+                        controller: returnDateController,
+                        errorText: errorModelClass.errorText.isNotEmpty
+                            ? errorModelClass.errorText
+                            : null,
+                        sufixIcon: Icon(
+                          Icons.calendar_today_sharp,
+                          color: value.returnDateFieldColor,
+                        ),
+                        inputparameter: [DateInputFormatter()],
+                        validate: (value) {
+                          return FieldValidator.validateDate(value);
+                        },
+                        hintText: "Enter Return Date",
+                        focusNode: returnDateFocusNode,
+                        fieldValidationkey: returnDateFieldKey),
+                  ),
                 ),
                 const SizedBox(
                   height: 6,
@@ -460,6 +482,11 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    onTap: () {
+                      textFieldColorChangeViewModel
+                          .setReturnDateFieldColor(Colors.black26);
+                    },
+                    boderColor: const Color(0xff0092ff),
                     controller: lenthCruiseController,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.number,
@@ -486,6 +513,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: cruiseLinePreferredController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -515,6 +543,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: shipNameController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -590,6 +619,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: cabinTypeController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -616,6 +646,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: numberOfCabinController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -643,6 +674,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: withOrWithoutController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -672,6 +704,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: gratuityController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -698,6 +731,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: numberOfPassengersController,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.number,
@@ -724,6 +758,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: passengersAgeController,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.number,

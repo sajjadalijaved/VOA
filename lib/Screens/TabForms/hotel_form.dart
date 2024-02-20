@@ -13,6 +13,8 @@ import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/services/splash_services.dart';
 import 'package:vacation_ownership_advisor/view_model/error_controll_view_model.dart';
+import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
+
 // ignore_for_file: must_be_immutable
 
 // ignore_for_file: unnecessary_null_comparison
@@ -270,6 +272,8 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
         Provider.of<ErrorModelClass>(context, listen: false);
+    TextFieldColorChangeViewModel textFieldColorChangeViewModel =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -297,63 +301,83 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   width: size.width,
                   child: Row(
                     children: [
-                      Expanded(
-                        child: CustomTextField(
-                            onTap: () {
-                              if (context != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                              }
-                              checkInDateMethod(context);
-                            },
-                            paddingLeft: size.width * 0.05,
-                            paddingRight: size.width * 0.01,
-                            controller: checkInDateController,
-                            focusNode: checkInDate,
-                            inputparameter: [DateInputFormatter()],
-                            validate: (value) {
-                              return FieldValidator.validateDate(value);
-                            },
-                            sufixIcon: const Icon(Icons.calendar_today_sharp),
-                            textInputType: TextInputType.datetime,
-                            hintText: "Check In",
-                            fieldValidationkey: checkInDateFieldKey),
-                      ),
-                      Consumer<ErrorModelClass>(
+                      Consumer<TextFieldColorChangeViewModel>(
                         builder: (context, value, child) => Expanded(
                           child: CustomTextField(
                               onTap: () {
-                                if (_checkInDate == null) {
-                                  errorModelClass
-                                      .setErrorText("First Fill Check In");
-                                } else {
-                                  errorModelClass.setErrorText("");
-                                }
-
+                                value.setCheckOUtFieldColor(Colors.black26);
+                                value.setCheckInFieldColor(
+                                    const Color(0xff0092ff));
                                 if (context != null) {
                                   FocusScope.of(context)
                                       .requestFocus(FocusNode());
                                 }
-                                checkOutDateMethod(context);
+                                checkInDateMethod(context);
                               },
-                              paddingLeft: size.width * 0.01,
-                              controller: checkOutController,
-                              readonly: true,
-                              sufixIcon: const Icon(Icons.calendar_today_sharp),
-                              focusNode: checkOutDate,
-                              errorText: errorModelClass.errorText.isNotEmpty
-                                  ? errorModelClass.errorText
-                                  : null,
-                              textInputType: TextInputType.datetime,
+                              paddingLeft: size.width * 0.05,
+                              paddingRight: size.width * 0.01,
+                              controller: checkInDateController,
+                              focusNode: checkInDate,
                               inputparameter: [DateInputFormatter()],
                               validate: (value) {
                                 return FieldValidator.validateDate(value);
                               },
-                              onChanged: (value) {
-                                checkOutFieldKey.currentState!.validate();
-                              },
-                              hintText: "Check Out",
-                              fieldValidationkey: checkOutFieldKey),
+                              sufixIcon: Icon(
+                                Icons.calendar_today_sharp,
+                                color: value.checkInFieldColor,
+                              ),
+                              textInputType: TextInputType.datetime,
+                              hintText: "Check In",
+                              boderColor: value.checkInFieldColor,
+                              fieldValidationkey: checkInDateFieldKey),
+                        ),
+                      ),
+                      Consumer<ErrorModelClass>(
+                        builder: (context, value, child) =>
+                            Consumer<TextFieldColorChangeViewModel>(
+                          builder: (context, value, child) => Expanded(
+                            child: CustomTextField(
+                                boderColor: value.checkOutFieldColor,
+                                onTap: () {
+                                  value.setCheckInFieldColor(Colors.black26);
+
+                                  value.setCheckOUtFieldColor(
+                                      const Color(0xff0092ff));
+                                  if (_checkInDate == null) {
+                                    errorModelClass
+                                        .setErrorText("First Fill Check In");
+                                  } else {
+                                    errorModelClass.setErrorText("");
+                                  }
+
+                                  if (context != null) {
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                  }
+                                  checkOutDateMethod(context);
+                                },
+                                paddingLeft: size.width * 0.01,
+                                controller: checkOutController,
+                                readonly: true,
+                                sufixIcon: Icon(
+                                  Icons.calendar_today_sharp,
+                                  color: value.checkOutFieldColor,
+                                ),
+                                focusNode: checkOutDate,
+                                errorText: errorModelClass.errorText.isNotEmpty
+                                    ? errorModelClass.errorText
+                                    : null,
+                                textInputType: TextInputType.datetime,
+                                inputparameter: [DateInputFormatter()],
+                                validate: (value) {
+                                  return FieldValidator.validateDate(value);
+                                },
+                                onChanged: (value) {
+                                  checkOutFieldKey.currentState!.validate();
+                                },
+                                hintText: "Check Out",
+                                fieldValidationkey: checkOutFieldKey),
+                          ),
                         ),
                       ),
                     ],
@@ -381,6 +405,11 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     children: [
                       Expanded(
                         child: CustomTextField(
+                            onTap: () {
+                              textFieldColorChangeViewModel
+                                  .setCheckOUtFieldColor(Colors.black26);
+                            },
+                            boderColor: const Color(0xff0092ff),
                             paddingRight: size.width * 0.01,
                             controller: stateController,
                             textCapitalization: TextCapitalization.words,
@@ -398,6 +427,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                       ),
                       Expanded(
                         child: CustomTextField(
+                            boderColor: const Color(0xff0092ff),
                             controller: cityController,
                             paddingLeft: size.width * 0.01,
                             textCapitalization: TextCapitalization.words,
@@ -420,6 +450,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   height: 6,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: countryController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -493,18 +524,20 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
-                    controller: hotelNameController,
-                    textCapitalization: TextCapitalization.words,
-                    inputAction: TextInputAction.next,
-                    textInputType: TextInputType.text,
-                    inputparameter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))
-                    ],
-                    validate: (value) {
-                      return FieldValidator.validateHotelName(value);
-                    },
-                    hintText: "Enter Preferred Hotel or Brand",
-                    fieldValidationkey: hotelNameFieldKey),
+                  controller: hotelNameController,
+                  textCapitalization: TextCapitalization.words,
+                  inputAction: TextInputAction.next,
+                  textInputType: TextInputType.text,
+                  inputparameter: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))
+                  ],
+                  validate: (value) {
+                    return FieldValidator.validateHotelName(value);
+                  },
+                  hintText: "Enter Preferred Hotel or Brand",
+                  fieldValidationkey: hotelNameFieldKey,
+                  boderColor: const Color(0xff0092ff),
+                ),
                 const SizedBox(
                   height: 6,
                 ),
@@ -525,8 +558,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   width: size.width,
                   child: Row(
                     children: [
-                      Expanded(
-                        child: CustomTextField(
+                      Consumer<TextFieldColorChangeViewModel>(
+                        builder: (context, value, child) => Expanded(
+                          child: CustomTextField(
                             paddingRight: size.width * 0.01,
                             controller: adultNumberController,
                             textCapitalization: TextCapitalization.words,
@@ -539,11 +573,15 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               return FieldValidator.validateAdultsNumber(value);
                             },
                             hintText: "Adults Number",
-                            fieldValidationkey: adultsFieldKey),
+                            fieldValidationkey: adultsFieldKey,
+                            boderColor: const Color(0xff0092ff),
+                          ),
+                        ),
                       ),
                       Expanded(
                         child: CustomTextField(
                             controller: kidController,
+                            boderColor: const Color(0xff0092ff),
                             paddingLeft: size.width * 0.01,
                             textCapitalization: TextCapitalization.words,
                             inputAction: TextInputAction.next,
@@ -582,6 +620,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     children: [
                       Expanded(
                         child: CustomTextField(
+                            boderColor: const Color(0xff0092ff),
                             paddingRight: size.width * 0.01,
                             controller: accommodationNeeds1Controller,
                             textCapitalization: TextCapitalization.words,
@@ -599,6 +638,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                       ),
                       Expanded(
                         child: CustomTextField(
+                            boderColor: const Color(0xff0092ff),
                             paddingLeft: size.width * 0.01,
                             controller: accommodationNeeds2Controller,
                             textCapitalization: TextCapitalization.words,
@@ -635,6 +675,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: mealController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -664,6 +705,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: budgetController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -674,7 +716,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateBudgetPerNight(value);
                     },
-                    hintText: "Enter Approximate Budget Per Night ",
+                    hintText: "\$5 ",
                     fieldValidationkey: budgetFieldKey),
                 Padding(
                   padding: EdgeInsets.only(

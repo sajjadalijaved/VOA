@@ -14,6 +14,7 @@ import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 import 'package:vacation_ownership_advisor/view_model/drop_down_view_model.dart';
 import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
+import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 // ignore_for_file: must_be_immutable
 
@@ -230,6 +231,8 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
         Provider.of<ErrorModelClass>(context, listen: false);
     DropDownViewModel dropDownViewModel =
         Provider.of<DropDownViewModel>(context, listen: false);
+    TextFieldColorChangeViewModel textFieldColorChangeViewModel =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -286,7 +289,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                           filled: true,
                           contentPadding: const EdgeInsets.all(10),
                         ),
-                        value: dropDownViewModel.dropdownValue,
+                        value: value.dropdownValueFlights,
                         isExpanded: true,
                         menuMaxHeight: 350,
                         items: [
@@ -302,9 +305,9 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                           }).toList(),
                         ],
                         onChanged: (newValue) {
-                          dropDownViewModel.dropDownValueMethod = newValue!;
+                          value.dropDownValueFlightsMethod = newValue!;
 
-                          log(dropDownViewModel.dropdownValue);
+                          log(value.dropdownValueFlights);
                         },
                         validator: (value) {
                           return FieldValidator.validateDropDown(
@@ -334,6 +337,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                     children: [
                       Expanded(
                         child: CustomTextField(
+                            boderColor: const Color(0xff0092ff),
                             paddingLeft: size.width * 0.05,
                             paddingRight: size.width * 0.01,
                             controller: fromLocationController,
@@ -346,25 +350,34 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                             hintText: "Airport Location",
                             fieldValidationkey: fromLocationFieldKey),
                       ),
-                      Expanded(
-                        child: CustomTextField(
-                            onTap: () {
-                              if (context != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                              }
-                              fromDateMethod(context);
-                            },
-                            paddingLeft: size.width * 0.01,
-                            controller: fromDateController,
-                            sufixIcon: const Icon(Icons.calendar_today_sharp),
-                            inputparameter: [DateInputFormatter()],
-                            validate: (value) {
-                              return FieldValidator.validateDate(value);
-                            },
-                            hintText: "From Date",
-                            focusNode: fromDate,
-                            fieldValidationkey: fromDateFieldKey),
+                      Consumer<TextFieldColorChangeViewModel>(
+                        builder: (context, value, child) => Expanded(
+                          child: CustomTextField(
+                              boderColor: value.fromDateColor,
+                              onTap: () {
+                                value.setToDateFieldColor(Colors.black26);
+                                value.setFromDateFieldColor(
+                                    const Color(0xff0092ff));
+                                if (context != null) {
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
+                                }
+                                fromDateMethod(context);
+                              },
+                              paddingLeft: size.width * 0.01,
+                              controller: fromDateController,
+                              sufixIcon: Icon(
+                                Icons.calendar_today_sharp,
+                                color: value.fromDateColor,
+                              ),
+                              inputparameter: [DateInputFormatter()],
+                              validate: (value) {
+                                return FieldValidator.validateDate(value);
+                              },
+                              hintText: "From Date",
+                              focusNode: fromDate,
+                              fieldValidationkey: fromDateFieldKey),
+                        ),
                       ),
                     ],
                   ),
@@ -391,6 +404,11 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                     children: [
                       Expanded(
                         child: CustomTextField(
+                            onTap: () {
+                              textFieldColorChangeViewModel
+                                  .setFromDateFieldColor(Colors.black26);
+                            },
+                            boderColor: const Color(0xff0092ff),
                             paddingRight: size.width * 0.01,
                             controller: toLocationController,
                             inputAction: TextInputAction.next,
@@ -403,35 +421,45 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                             fieldValidationkey: toLocationFieldKey),
                       ),
                       Consumer<ErrorModelClass>(
-                        builder: (context, value, child) => Expanded(
-                          child: CustomTextField(
-                              onTap: () {
-                                if (_fromDate == null) {
-                                  errorModelClass
-                                      .setErrorText("First Fill From Date");
-                                } else {
-                                  errorModelClass.setErrorText("");
-                                }
+                        builder: (context, value, child) =>
+                            Consumer<TextFieldColorChangeViewModel>(
+                          builder: (context, value, child) => Expanded(
+                            child: CustomTextField(
+                                boderColor: value.toFieldColor,
+                                onTap: () {
+                                  value.setFromDateFieldColor(Colors.black26);
+                                  value.setToDateFieldColor(
+                                      const Color(0xff0092ff));
+                                  if (_fromDate == null) {
+                                    errorModelClass
+                                        .setErrorText("First Fill From Date");
+                                  } else {
+                                    errorModelClass.setErrorText("");
+                                  }
 
-                                if (context != null) {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                }
-                                toDateMethod(context);
-                              },
-                              controller: toDateController,
-                              errorText: errorModelClass.errorText.isNotEmpty
-                                  ? errorModelClass.errorText
-                                  : null,
-                              paddingLeft: size.width * 0.01,
-                              inputparameter: [DateInputFormatter()],
-                              sufixIcon: const Icon(Icons.calendar_today_sharp),
-                              validate: (value) {
-                                return FieldValidator.validateDate(value);
-                              },
-                              hintText: "To Date",
-                              focusNode: toDate,
-                              fieldValidationkey: toDateFieldKey),
+                                  if (context != null) {
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                  }
+                                  toDateMethod(context);
+                                },
+                                controller: toDateController,
+                                errorText: errorModelClass.errorText.isNotEmpty
+                                    ? errorModelClass.errorText
+                                    : null,
+                                paddingLeft: size.width * 0.01,
+                                inputparameter: [DateInputFormatter()],
+                                sufixIcon: Icon(
+                                  Icons.calendar_today_sharp,
+                                  color: value.toFieldColor,
+                                ),
+                                validate: (value) {
+                                  return FieldValidator.validateDate(value);
+                                },
+                                hintText: "To Date",
+                                focusNode: toDate,
+                                fieldValidationkey: toDateFieldKey),
+                          ),
                         ),
                       ),
                     ],
@@ -454,6 +482,11 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    onTap: () {
+                      textFieldColorChangeViewModel
+                          .setToDateFieldColor(Colors.black26);
+                    },
+                    boderColor: const Color(0xff0092ff),
                     controller: numberofTravellersController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -481,6 +514,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: preferredAirlineController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -510,6 +544,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: prefeeredServicesController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -624,7 +659,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                                   : getContact.toString(),
                               email: email1,
                               mobile: mobile,
-                              type: dropDownViewModel.dropdownValue,
+                              type: dropDownViewModel.dropdownValueFlights,
                               toDate: toDate,
                               fromDate: fromDate,
                               preferredAirline: preferredAirline,
@@ -636,7 +671,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                                   ? getContactCreatId!.toString()
                                   : getContact.toString(),
                               additionalInformation: additionalInformation);
-                          dropDownViewModel.dropDownValueMethod = '';
+                          dropDownViewModel.dropDownValueFlightsMethod = '';
                           fromLocationController.clear();
                           toLocationController.clear();
                           fromDateController.clear();

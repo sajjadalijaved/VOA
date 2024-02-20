@@ -147,7 +147,7 @@ class TabsScreenAuth {
           "cf_number_of_rooms": numberroom,
           "cf_room_preferences": roomperfance,
           "cf_meal_inclusion": meal,
-          "cf_approximate_budget_per_night": budget,
+          "cf_budget_per_night": budget,
           "cf_user_id": userId,
           "cf_full_name": firstname,
           "cf_additional_information": additionalInformation,

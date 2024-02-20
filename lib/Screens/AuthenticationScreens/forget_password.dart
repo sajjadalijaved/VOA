@@ -10,6 +10,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 class CheckConnectivityForgetPassword extends StatelessWidget {
   const CheckConnectivityForgetPassword({Key? key}) : super(key: key);
@@ -38,17 +39,25 @@ class ForgetPassword extends StatefulWidget {
 }
 
 class _ForgetPasswordState extends State<ForgetPassword> {
-  final TextEditingController _emailController = TextEditingController();
+  late TextEditingController _emailController;
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _emailkey = GlobalKey<FormFieldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setEmailForgetFieldColor(Colors.black26);
+    });
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
   }
-
-  Color emailColor = Colors.black26;
 
   @override
   Widget build(BuildContext context) {
@@ -124,28 +133,29 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               SizedBox(
                 height: height * .03,
               ),
-              FadeInUp(
-                delay: const Duration(milliseconds: 1800),
-                duration: const Duration(milliseconds: 1000),
-                child: CustomTextField(
-                  onTap: () {
-                    setState(() {
-                      emailColor = const Color(0xff0092ff);
-                    });
-                  },
-                  hintText: "Email",
-                  prefixIcon: Icon(
-                    Icons.email_outlined,
-                    color: emailColor,
+              Consumer<TextFieldColorChangeViewModel>(
+                builder: (context, value, child) => FadeInUp(
+                  delay: const Duration(milliseconds: 1800),
+                  duration: const Duration(milliseconds: 1000),
+                  child: CustomTextField(
+                    onTap: () {
+                      value.setEmailForgetFieldColor(const Color(0xff0092ff));
+                    },
+                    hintText: "Email",
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: value.emailForgetFieldColor,
+                    ),
+                    controller: _emailController,
+                    fieldValidationkey: _emailkey,
+                    validate: (value) {
+                      return FieldValidator.validateEmail(value.toString());
+                    },
+                    onChanged: (value) {
+                      _emailkey.currentState!.validate();
+                    },
+                    boderColor: value.emailForgetFieldColor,
                   ),
-                  controller: _emailController,
-                  fieldValidationkey: _emailkey,
-                  validate: (value) {
-                    return FieldValidator.validateEmail(value.toString());
-                  },
-                  onChanged: (value) {
-                    _emailkey.currentState!.validate();
-                  },
                 ),
               ),
               SizedBox(

@@ -13,6 +13,7 @@ import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 // ignore_for_file: unused_local_variable
 
@@ -66,15 +67,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // show password icon control provider
   ValueNotifier<bool> passwordobsureText = ValueNotifier<bool>(true);
   ValueNotifier<bool> confirmPasswordObscureText = ValueNotifier<bool>(true);
-  // colors for fields
-  Color firstNameColor = Colors.black26;
-
-  Color phoneNumberColor = Colors.black26;
-  Color emailColor = Colors.black26;
-  Color passwordColor = Colors.black26;
-  Color confirmPasswordColor = Colors.black26;
-  Color eyeColor = Colors.black26;
-  Color eyeColor1 = Colors.black26;
 
   static String storeToken = "";
 
@@ -94,6 +86,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     phoneNumberController = TextEditingController();
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setPassworSignUpdFieldColor(Colors.black26);
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setEmailSignUpFieldColor(Colors.black26);
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setNameFieldColor(Colors.black26);
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setPhoneFieldColor(Colors.black26);
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setPasswordConfirmFieldColor(Colors.black26);
+    });
   }
 
 // dispose method
@@ -102,7 +107,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     emailController.dispose();
     passwordController.dispose();
     firstNameController.dispose();
-
     phoneNumberController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -113,6 +117,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     double height = MediaQuery.sizeOf(context).height;
     double width = MediaQuery.sizeOf(context).width;
     final authViewModal = Provider.of<AuthViewModal>(context);
+    final textfieldColor =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -172,41 +178,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: height * .01,
                 ),
                 // first name text field
-                FadeInRight(
-                  delay: const Duration(milliseconds: 1300),
-                  duration: const Duration(milliseconds: 1000),
-                  child: CustomTextField(
-                    textCapitalization: TextCapitalization.words,
-                    inputparameter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))
-                    ],
-                    onTap: () {
-                      setState(() {
-                        firstNameColor = const Color(0xFF0092ff);
-
-                        phoneNumberColor = Colors.black26;
-                        emailColor = Colors.black26;
-                        passwordColor = Colors.black26;
-                        confirmPasswordColor = Colors.black26;
-                        eyeColor = Colors.black26;
-                        eyeColor1 = Colors.black26;
-                      });
-                    },
-                    validate: (value) {
-                      return FieldValidator.validateName(value.toString());
-                    },
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: firstNameColor,
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => FadeInRight(
+                    delay: const Duration(milliseconds: 1300),
+                    duration: const Duration(milliseconds: 1000),
+                    child: CustomTextField(
+                      textCapitalization: TextCapitalization.words,
+                      inputparameter: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))
+                      ],
+                      onTap: () {
+                        value.setEmailSignUpFieldColor(Colors.black26);
+                        value.setNameFieldColor(const Color(0xff0092ff));
+                        value.setPassworSignUpdFieldColor(Colors.black26);
+                        value.setPasswordConfirmFieldColor(Colors.black26);
+                        value.setPhoneFieldColor(Colors.black26);
+                      },
+                      validate: (value) {
+                        return FieldValidator.validateName(value.toString());
+                      },
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: value.nameFieldColor,
+                      ),
+                      controller: firstNameController,
+                      fieldValidationkey: firstNameFieldKey,
+                      hintText: "Full Name",
+                      textInputType: TextInputType.name,
+                      inputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        firstNameFieldKey.currentState!.validate();
+                      },
+                      boderColor: value.nameFieldColor,
                     ),
-                    controller: firstNameController,
-                    fieldValidationkey: firstNameFieldKey,
-                    hintText: "Full Name",
-                    textInputType: TextInputType.name,
-                    inputAction: TextInputAction.next,
-                    onChanged: (value) {
-                      firstNameFieldKey.currentState!.validate();
-                    },
                   ),
                 ),
                 // space
@@ -215,38 +219,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
 
                 // phone number text field
-                FadeInRight(
-                  delay: const Duration(milliseconds: 1400),
-                  duration: const Duration(milliseconds: 1000),
-                  child: CustomTextField(
-                    onTap: () {
-                      setState(() {
-                        firstNameColor = Colors.black26;
-
-                        phoneNumberColor = const Color(0xFF0092ff);
-                        emailColor = Colors.black26;
-                        passwordColor = Colors.black26;
-                        confirmPasswordColor = Colors.black26;
-                        eyeColor = Colors.black26;
-                        eyeColor1 = Colors.black26;
-                      });
-                    },
-                    validate: (value) {
-                      return FieldValidator.validatePhoneNumber(
-                          value.toString());
-                    },
-                    prefixIcon: Icon(
-                      Icons.phone_android_outlined,
-                      color: phoneNumberColor,
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => FadeInRight(
+                    delay: const Duration(milliseconds: 1400),
+                    duration: const Duration(milliseconds: 1000),
+                    child: CustomTextField(
+                      onTap: () {
+                        value.setEmailSignUpFieldColor(Colors.black26);
+                        value.setNameFieldColor(Colors.black26);
+                        value.setPassworSignUpdFieldColor(Colors.black26);
+                        value.setPasswordConfirmFieldColor(Colors.black26);
+                        value.setPhoneFieldColor(const Color(0xff0092ff));
+                      },
+                      validate: (value) {
+                        return FieldValidator.validatePhoneNumber(
+                            value.toString());
+                      },
+                      prefixIcon: Icon(
+                        Icons.phone_android_outlined,
+                        color: value.phoneFieldColor,
+                      ),
+                      controller: phoneNumberController,
+                      fieldValidationkey: phoneNumberFieldKey,
+                      hintText: "Phone Number",
+                      textInputType: TextInputType.phone,
+                      inputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        phoneNumberFieldKey.currentState!.validate();
+                      },
+                      boderColor: value.phoneFieldColor,
                     ),
-                    controller: phoneNumberController,
-                    fieldValidationkey: phoneNumberFieldKey,
-                    hintText: "Phone Number",
-                    textInputType: TextInputType.phone,
-                    inputAction: TextInputAction.next,
-                    onChanged: (value) {
-                      phoneNumberFieldKey.currentState!.validate();
-                    },
                   ),
                 ),
                 // space
@@ -254,37 +256,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: height * .01,
                 ),
                 // email text field
-                FadeInRight(
-                  delay: const Duration(milliseconds: 1500),
-                  duration: const Duration(milliseconds: 1000),
-                  child: CustomTextField(
-                    onTap: () {
-                      setState(() {
-                        firstNameColor = Colors.black26;
-
-                        phoneNumberColor = Colors.black26;
-                        emailColor = const Color(0xFF0092ff);
-                        passwordColor = Colors.black26;
-                        confirmPasswordColor = Colors.black26;
-                        eyeColor = Colors.black26;
-                        eyeColor1 = Colors.black26;
-                      });
-                    },
-                    validate: (value) {
-                      return FieldValidator.validateEmail(value.toString());
-                    },
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: emailColor,
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => FadeInRight(
+                    delay: const Duration(milliseconds: 1500),
+                    duration: const Duration(milliseconds: 1000),
+                    child: CustomTextField(
+                      onTap: () {
+                        value.setEmailSignUpFieldColor(const Color(0xff0092ff));
+                        value.setNameFieldColor(Colors.black26);
+                        value.setPassworSignUpdFieldColor(Colors.black26);
+                        value.setPasswordConfirmFieldColor(Colors.black26);
+                        value.setPhoneFieldColor(Colors.black26);
+                      },
+                      validate: (value) {
+                        return FieldValidator.validateEmail(value.toString());
+                      },
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                        color: value.emailSignUpFieldColor,
+                      ),
+                      controller: emailController,
+                      fieldValidationkey: emailFieldKey,
+                      hintText: "User Email",
+                      textInputType: TextInputType.emailAddress,
+                      inputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        emailFieldKey.currentState!.validate();
+                      },
+                      boderColor: value.emailSignUpFieldColor,
                     ),
-                    controller: emailController,
-                    fieldValidationkey: emailFieldKey,
-                    hintText: "User Email",
-                    textInputType: TextInputType.emailAddress,
-                    inputAction: TextInputAction.next,
-                    onChanged: (value) {
-                      emailFieldKey.currentState!.validate();
-                    },
                   ),
                 ),
                 // space
@@ -294,48 +294,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // password text field
                 ValueListenableBuilder(
                   valueListenable: passwordobsureText,
-                  builder: (context, value, child) => FadeInRight(
-                    delay: const Duration(milliseconds: 1600),
-                    duration: const Duration(milliseconds: 1000),
-                    child: CustomTextField(
-                      onTap: () {
-                        setState(() {
-                          firstNameColor = Colors.black26;
-
-                          phoneNumberColor = Colors.black26;
-                          emailColor = Colors.black26;
-                          passwordColor = const Color(0xFF0092ff);
-                          confirmPasswordColor = Colors.black26;
-                          eyeColor = const Color(0xFF0092ff);
-                          eyeColor1 = Colors.black26;
-                        });
-                      },
-                      character: '*',
-                      onChanged: (value) {
-                        passwordFieldKey.currentState!.validate();
-                      },
-                      prefixIcon: Icon(
-                        Icons.lock,
-                        color: passwordColor,
-                      ),
-                      controller: passwordController,
-                      fieldValidationkey: passwordFieldKey,
-                      hintText: "User Password",
-                      textInputType: TextInputType.visiblePassword,
-                      validate: (value) {
-                        return FieldValidator.validatePassword(
-                            value.toString());
-                      },
-                      obscureText: passwordobsureText.value,
-                      sufixIcon: InkWell(
+                  builder: (context, value, child) =>
+                      Consumer<TextFieldColorChangeViewModel>(
+                    builder: (context, value, child) => FadeInRight(
+                      delay: const Duration(milliseconds: 1600),
+                      duration: const Duration(milliseconds: 1000),
+                      child: CustomTextField(
                         onTap: () {
-                          passwordobsureText.value = !passwordobsureText.value;
+                          value.setEmailSignUpFieldColor(Colors.black26);
+                          value.setNameFieldColor(Colors.black26);
+                          value.setPassworSignUpdFieldColor(
+                              const Color(0xff0092ff));
+                          value.setPasswordConfirmFieldColor(Colors.black26);
+                          value.setPhoneFieldColor(Colors.black26);
                         },
-                        child: Icon(
-                            passwordobsureText.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility,
-                            color: eyeColor),
+                        character: '*',
+                        onChanged: (value) {
+                          passwordFieldKey.currentState!.validate();
+                        },
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          color: value.passwordSignUpFieldColor,
+                        ),
+                        controller: passwordController,
+                        fieldValidationkey: passwordFieldKey,
+                        hintText: "User Password",
+                        textInputType: TextInputType.visiblePassword,
+                        validate: (value) {
+                          return FieldValidator.validatePassword(
+                              value.toString());
+                        },
+                        obscureText: passwordobsureText.value,
+                        sufixIcon: InkWell(
+                          onTap: () {
+                            passwordobsureText.value =
+                                !passwordobsureText.value;
+                          },
+                          child: Icon(
+                              passwordobsureText.value
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility,
+                              color: value.passwordSignUpFieldColor),
+                        ),
+                        boderColor: value.passwordFieldColor,
                       ),
                     ),
                   ),
@@ -347,50 +348,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // confirm password text field
                 ValueListenableBuilder(
                   valueListenable: confirmPasswordObscureText,
-                  builder: (context, value, child) => FadeInRight(
-                    delay: const Duration(milliseconds: 1700),
-                    duration: const Duration(milliseconds: 1000),
-                    child: CustomTextField(
-                      onTap: () {
-                        setState(() {
-                          firstNameColor = Colors.black26;
-
-                          phoneNumberColor = Colors.black26;
-                          emailColor = Colors.black26;
-                          passwordColor = Colors.black26;
-                          confirmPasswordColor = const Color(0xFF0092ff);
-                          eyeColor = Colors.black26;
-                          eyeColor1 = const Color(0xFF0092ff);
-                        });
-                      },
-                      character: '*',
-                      onChanged: (value) {
-                        confirmPasswordFieldKey.currentState!.validate();
-                      },
-                      prefixIcon: Icon(
-                        Icons.password,
-                        color: confirmPasswordColor,
-                      ),
-                      controller: confirmPasswordController,
-                      fieldValidationkey: confirmPasswordFieldKey,
-                      hintText: "Confirm Password",
-                      textInputType: TextInputType.visiblePassword,
-                      validate: (value) {
-                        return FieldValidator.validatePasswordMatch(
-                            value.toString(),
-                            passwordController.text.toString());
-                      },
-                      obscureText: confirmPasswordObscureText.value,
-                      sufixIcon: InkWell(
+                  builder: (context, value, child) =>
+                      Consumer<TextFieldColorChangeViewModel>(
+                    builder: (context, value, child) => FadeInRight(
+                      delay: const Duration(milliseconds: 1700),
+                      duration: const Duration(milliseconds: 1000),
+                      child: CustomTextField(
                         onTap: () {
-                          confirmPasswordObscureText.value =
-                              !confirmPasswordObscureText.value;
+                          value.setEmailSignUpFieldColor(Colors.black26);
+                          value.setNameFieldColor(Colors.black26);
+                          value.setPassworSignUpdFieldColor(Colors.black26);
+                          value.setPasswordConfirmFieldColor(
+                              const Color(0xff0092ff));
+                          value.setPhoneFieldColor(Colors.black26);
                         },
-                        child: Icon(
-                            confirmPasswordObscureText.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility,
-                            color: eyeColor1),
+                        character: '*',
+                        onChanged: (value) {
+                          confirmPasswordFieldKey.currentState!.validate();
+                        },
+                        prefixIcon: Icon(
+                          Icons.password,
+                          color: value.passwordConfirmFieldColor,
+                        ),
+                        controller: confirmPasswordController,
+                        fieldValidationkey: confirmPasswordFieldKey,
+                        hintText: "Confirm Password",
+                        textInputType: TextInputType.visiblePassword,
+                        validate: (value) {
+                          return FieldValidator.validatePasswordMatch(
+                              value.toString(),
+                              passwordController.text.toString());
+                        },
+                        obscureText: confirmPasswordObscureText.value,
+                        sufixIcon: InkWell(
+                          onTap: () {
+                            confirmPasswordObscureText.value =
+                                !confirmPasswordObscureText.value;
+                          },
+                          child: Icon(
+                              confirmPasswordObscureText.value
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility,
+                              color: value.passwordConfirmFieldColor),
+                        ),
+                        boderColor: value.passwordConfirmFieldColor,
                       ),
                     ),
                   ),

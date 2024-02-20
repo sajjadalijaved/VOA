@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'view_model/user_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'view_model/textformfield_change_color_view_model.dart';
 import 'package:vacation_ownership_advisor/Screens/splashscreen.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/view_model/drop_down_view_model.dart';
@@ -51,6 +52,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => DropDownViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TextFieldColorChangeViewModel(),
         )
       ],
       child: MaterialApp(
@@ -60,7 +64,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             colorScheme:
                 ColorScheme.fromSeed(seedColor: const Color(0xFF0092ff)),
-            //useMaterial3: true,
+            useMaterial3: true,
           ),
           home: const CheckConnectivitySplashScreen()),
     );

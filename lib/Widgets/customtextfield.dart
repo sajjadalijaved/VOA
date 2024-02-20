@@ -17,6 +17,7 @@ class CustomTextField extends StatelessWidget {
       this.paddingRight,
       this.inputparameter,
       this.style,
+      required this.boderColor,
       this.readonly = false,
       this.textCapitalization = TextCapitalization.none,
       required this.controller,
@@ -34,6 +35,7 @@ class CustomTextField extends StatelessWidget {
   TextInputAction? inputAction;
   TextCapitalization textCapitalization;
   bool obscureText;
+  final Color boderColor;
   String? hintText;
   double? paddingLeft;
   double? paddingRight;
@@ -85,10 +87,10 @@ class CustomTextField extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(5)),
           focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFF0092ff), width: 1),
+              borderSide: BorderSide(color: boderColor, width: 1),
               borderRadius: BorderRadius.circular(5)),
           border: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFF0092ff), width: 1),
+              borderSide: BorderSide(color: boderColor, width: 1),
               borderRadius: BorderRadius.circular(5)),
           disabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Color(0xFF0092ff), width: 1),

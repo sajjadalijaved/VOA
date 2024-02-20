@@ -11,6 +11,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../view_model/textformfield_change_color_view_model.dart';
 
 class CheckConnectivityLogin extends StatelessWidget {
   const CheckConnectivityLogin({Key? key}) : super(key: key);
@@ -49,14 +50,19 @@ class _LoginScreenState extends State<LoginScreen> {
   // show password icon provider
   ValueNotifier<bool> obscureText = ValueNotifier<bool>(true);
 // field colors
-  Color emailColor = Colors.black26;
-  Color passwordColor = Colors.black26;
-  Color eyeColor = Colors.black26;
+
   @override
   void initState() {
     super.initState();
     emailController = TextEditingController();
     passwordController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setPasswordFieldColor(Colors.black26);
+      Provider.of<TextFieldColorChangeViewModel>(context, listen: false)
+          .setEmailFieldColor(Colors.black26);
+    });
   }
 
   @override
@@ -131,33 +137,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: height * .03,
                 ),
                 // email text-field
-                FadeInRight(
-                  delay: const Duration(milliseconds: 1400),
-                  duration: const Duration(milliseconds: 1000),
-                  child: CustomTextField(
-                    onTap: () {
-                      setState(() {
-                        emailColor = const Color(0xff0092ff);
-                        passwordColor = Colors.black26;
-                        eyeColor = Colors.black26;
-                      });
-                    },
-                    validate: (value) {
-                      return FieldValidator.validateEmail(value.toString());
-                    },
-                    style: const TextStyle(color: Colors.black),
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: emailColor,
+                Consumer<TextFieldColorChangeViewModel>(
+                  builder: (context, value, child) => FadeInRight(
+                    delay: const Duration(milliseconds: 1400),
+                    duration: const Duration(milliseconds: 1000),
+                    child: CustomTextField(
+                      onTap: () {
+                        value.setEmailFieldColor(const Color(0xff0092ff));
+                        value.setPasswordFieldColor(Colors.black26);
+                      },
+                      validate: (value) {
+                        return FieldValidator.validateEmail(value.toString());
+                      },
+                      style: const TextStyle(color: Colors.black),
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                        color: value.emailFieldColor,
+                      ),
+                      controller: emailController,
+                      fieldValidationkey: emailFieldKey,
+                      hintText: "User Email",
+                      textInputType: TextInputType.emailAddress,
+                      inputAction: TextInputAction.next,
+                      onChanged: (value) {
+                        emailFieldKey.currentState!.validate();
+                      },
+                      boderColor: value.emailFieldColor,
                     ),
-                    controller: emailController,
-                    fieldValidationkey: emailFieldKey,
-                    hintText: "User Email",
-                    textInputType: TextInputType.emailAddress,
-                    inputAction: TextInputAction.next,
-                    onChanged: (value) {
-                      emailFieldKey.currentState!.validate();
-                    },
                   ),
                 ),
                 // space
@@ -170,37 +176,38 @@ class _LoginScreenState extends State<LoginScreen> {
                   builder: (context, value, child) => FadeInRight(
                     delay: const Duration(milliseconds: 1600),
                     duration: const Duration(milliseconds: 1000),
-                    child: CustomTextField(
-                      onTap: () {
-                        setState(() {
-                          emailColor = Colors.black26;
-                          passwordColor = const Color(0xff0092ff);
-                          eyeColor = const Color(0xff0092ff);
-                        });
-                      },
-                      character: '*',
-                      onChanged: (value) {
-                        passwordFieldKey.currentState!.validate();
-                      },
-                      prefixIcon: Icon(Icons.lock, color: passwordColor),
-                      controller: passwordController,
-                      fieldValidationkey: passwordFieldKey,
-                      hintText: "User Password",
-                      textInputType: TextInputType.visiblePassword,
-                      validate: (value) {
-                        return FieldValidator.validatePassword(
-                            value.toString());
-                      },
-                      obscureText: obscureText.value,
-                      sufixIcon: InkWell(
-                          onTap: () {
-                            obscureText.value = !obscureText.value;
-                          },
-                          child: Icon(
-                              obscureText.value
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility,
-                              color: eyeColor)),
+                    child: Consumer<TextFieldColorChangeViewModel>(
+                      builder: (context, value, child) => CustomTextField(
+                        onTap: () {
+                          value.setEmailFieldColor(Colors.black26);
+                          value.setPasswordFieldColor(const Color(0xff0092ff));
+                        },
+                        character: '*',
+                        onChanged: (value) {
+                          passwordFieldKey.currentState!.validate();
+                        },
+                        prefixIcon:
+                            Icon(Icons.lock, color: value.passwordFieldColor),
+                        controller: passwordController,
+                        fieldValidationkey: passwordFieldKey,
+                        hintText: "User Password",
+                        textInputType: TextInputType.visiblePassword,
+                        validate: (value) {
+                          return FieldValidator.validatePassword(
+                              value.toString());
+                        },
+                        obscureText: obscureText.value,
+                        sufixIcon: InkWell(
+                            onTap: () {
+                              obscureText.value = !obscureText.value;
+                            },
+                            child: Icon(
+                                obscureText.value
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility,
+                                color: value.passwordFieldColor)),
+                        boderColor: value.passwordFieldColor,
+                      ),
                     ),
                   ),
                 ),

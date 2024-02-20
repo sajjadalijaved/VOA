@@ -13,6 +13,7 @@ import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/error_controll_view_model.dart';
+import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 // ignore_for_file: must_be_immutable
 
@@ -268,6 +269,8 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
         Provider.of<ErrorModelClass>(context, listen: false);
+    TextFieldColorChangeViewModel textFieldColorChangeViewModel =
+        Provider.of<TextFieldColorChangeViewModel>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -292,6 +295,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: pickLocationController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -308,46 +312,68 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   width: size.width,
                   child: Row(
                     children: [
-                      Expanded(
-                        child: CustomTextField(
-                            onTap: () {
-                              if (context != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                              }
-                              pickUpDateMethod(context);
-                            },
-                            paddingLeft: size.width * 0.05,
-                            paddingRight: size.width * 0.01,
-                            controller: pickDateController,
-                            focusNode: pickUpDate,
-                            inputparameter: [DateInputFormatter()],
-                            validate: (value) {
-                              return FieldValidator.validateDate(value);
-                            },
-                            sufixIcon: const Icon(Icons.calendar_today_sharp),
-                            inputAction: TextInputAction.none,
-                            hintText: "Pickup Date",
-                            fieldValidationkey: pickDateFieldKey),
+                      Consumer<TextFieldColorChangeViewModel>(
+                        builder: (context, value, child) => Expanded(
+                          child: CustomTextField(
+                              boderColor: value.pickDateFieldColor,
+                              onTap: () {
+                                value.setPickTimeFieldColor(Colors.black26);
+                                value.setDropDateFieldColor(Colors.black26);
+                                value.setDropTimeFieldColor(Colors.black26);
+                                value.setPickDateFieldColor(
+                                    const Color(0xff0092ff));
+                                if (context != null) {
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
+                                }
+                                pickUpDateMethod(context);
+                              },
+                              paddingLeft: size.width * 0.05,
+                              paddingRight: size.width * 0.01,
+                              controller: pickDateController,
+                              focusNode: pickUpDate,
+                              inputparameter: [DateInputFormatter()],
+                              validate: (value) {
+                                return FieldValidator.validateDate(value);
+                              },
+                              sufixIcon: Icon(
+                                Icons.calendar_today_sharp,
+                                color: value.pickDateFieldColor,
+                              ),
+                              inputAction: TextInputAction.none,
+                              hintText: "Pickup Date",
+                              fieldValidationkey: pickDateFieldKey),
+                        ),
                       ),
-                      Expanded(
-                        child: CustomTextField(
-                            onTap: () {
-                              if (context != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                              }
-                              pickTimeMethod(context);
-                            },
-                            paddingLeft: size.width * 0.01,
-                            controller: pickTimeController,
-                            focusNode: pickUpTime,
-                            sufixIcon: const Icon(Icons.timer),
-                            validate: (value) {
-                              return FieldValidator.validateTime(value);
-                            },
-                            hintText: "Pickup Time",
-                            fieldValidationkey: pickTimeFieldKey),
+                      Consumer<TextFieldColorChangeViewModel>(
+                        builder: (context, value, child) => Expanded(
+                          child: CustomTextField(
+                              boderColor: value.pickTimeFieldColor,
+                              onTap: () {
+                                value.setPickDateFieldColor(Colors.black26);
+                                value.setDropDateFieldColor(Colors.black26);
+                                value.setDropTimeFieldColor(Colors.black26);
+                                value.setPickTimeFieldColor(
+                                    const Color(0xff0092ff));
+                                if (context != null) {
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
+                                }
+                                pickTimeMethod(context);
+                              },
+                              paddingLeft: size.width * 0.01,
+                              controller: pickTimeController,
+                              focusNode: pickUpTime,
+                              sufixIcon: Icon(
+                                Icons.timer,
+                                color: value.pickTimeFieldColor,
+                              ),
+                              validate: (value) {
+                                return FieldValidator.validateTime(value);
+                              },
+                              hintText: "Pickup Time",
+                              fieldValidationkey: pickTimeFieldKey),
+                        ),
                       ),
                     ],
                   ),
@@ -369,6 +395,13 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    onTap: () {
+                      textFieldColorChangeViewModel
+                          .setPickTimeFieldColor(Colors.black26);
+                      textFieldColorChangeViewModel
+                          .setPickDateFieldColor(Colors.black26);
+                    },
+                    boderColor: const Color(0xff0092ff),
                     controller: dropLocationController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -386,55 +419,78 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   child: Row(
                     children: [
                       Consumer<ErrorModelClass>(
+                        builder: (context, value, child) =>
+                            Consumer<TextFieldColorChangeViewModel>(
+                          builder: (context, value, child) => Expanded(
+                            child: CustomTextField(
+                                boderColor: value.dropDateColor,
+                                onTap: () {
+                                  value.setPickTimeFieldColor(Colors.black26);
+                                  value.setPickDateFieldColor(Colors.black26);
+                                  value.setDropTimeFieldColor(Colors.black26);
+                                  value.setDropDateFieldColor(
+                                      const Color(0xff0092ff));
+                                  if (_pickDate == null) {
+                                    errorModelClass
+                                        .setErrorText("First Fill PickUp Date");
+                                  } else {
+                                    errorModelClass.setErrorText("");
+                                  }
+
+                                  if (context != null) {
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                  }
+                                  dropDateMethod(context);
+                                },
+                                paddingRight: size.width * 0.01,
+                                controller: dropDateController,
+                                focusNode: dropOffDate,
+                                errorText: errorModelClass.errorText.isNotEmpty
+                                    ? errorModelClass.errorText
+                                    : null,
+                                inputparameter: [DateInputFormatter()],
+                                validate: (value) {
+                                  return FieldValidator.validateDate(value);
+                                },
+                                sufixIcon: Icon(
+                                  Icons.calendar_today_sharp,
+                                  color: value.dropDateColor,
+                                ),
+                                hintText: "Drop Date",
+                                fieldValidationkey: dropDateFieldKey),
+                          ),
+                        ),
+                      ),
+                      Consumer<TextFieldColorChangeViewModel>(
                         builder: (context, value, child) => Expanded(
                           child: CustomTextField(
+                              boderColor: value.dropTimeFieldColor,
                               onTap: () {
-                                if (_pickDate == null) {
-                                  errorModelClass
-                                      .setErrorText("First Fill PickUp Date");
-                                } else {
-                                  errorModelClass.setErrorText("");
-                                }
-
+                                value.setPickTimeFieldColor(Colors.black26);
+                                value.setDropDateFieldColor(Colors.black26);
+                                value.setPickDateFieldColor(Colors.black26);
+                                value.setDropTimeFieldColor(
+                                    const Color(0xff0092ff));
                                 if (context != null) {
                                   FocusScope.of(context)
                                       .requestFocus(FocusNode());
                                 }
-                                dropDateMethod(context);
+                                dropTimeMethod(context);
                               },
-                              paddingRight: size.width * 0.01,
-                              controller: dropDateController,
-                              focusNode: dropOffDate,
-                              errorText: errorModelClass.errorText.isNotEmpty
-                                  ? errorModelClass.errorText
-                                  : null,
-                              inputparameter: [DateInputFormatter()],
+                              controller: dropTimeController,
+                              paddingLeft: size.width * 0.01,
+                              sufixIcon: Icon(
+                                Icons.timer,
+                                color: value.dropTimeFieldColor,
+                              ),
                               validate: (value) {
-                                return FieldValidator.validateDate(value);
+                                return FieldValidator.validateTime(value);
                               },
-                              sufixIcon: const Icon(Icons.calendar_today_sharp),
-                              hintText: "Drop Date",
-                              fieldValidationkey: dropDateFieldKey),
+                              hintText: "Drop Time",
+                              focusNode: dropOffTime,
+                              fieldValidationkey: dropTimeFieldKey),
                         ),
-                      ),
-                      Expanded(
-                        child: CustomTextField(
-                            onTap: () {
-                              if (context != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                              }
-                              dropTimeMethod(context);
-                            },
-                            controller: dropTimeController,
-                            paddingLeft: size.width * 0.01,
-                            sufixIcon: const Icon(Icons.timer),
-                            validate: (value) {
-                              return FieldValidator.validateTime(value);
-                            },
-                            hintText: "Drop Time",
-                            focusNode: dropOffTime,
-                            fieldValidationkey: dropTimeFieldKey),
                       ),
                     ],
                   ),
@@ -456,6 +512,13 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    onTap: () {
+                      textFieldColorChangeViewModel
+                          .setDropTimeFieldColor(Colors.black26);
+                      textFieldColorChangeViewModel
+                          .setDropDateFieldColor(Colors.black26);
+                    },
+                    boderColor: const Color(0xff0092ff),
                     controller: typeCarController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
@@ -485,6 +548,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   height: 5,
                 ),
                 CustomTextField(
+                    boderColor: const Color(0xff0092ff),
                     controller: preferedCompanyController,
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
