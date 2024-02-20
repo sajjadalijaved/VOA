@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228266539588",
+    "project_id": "vacation-owner",
+    "storage_bucket": "vacation-owner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228266539588:android:4a3238be010c9cf8fa1a11",
+        "android_client_info": {
+          "package_name": "app.vacation.ownership.advisor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk4MiaMWcklUL_QOpULYB40RPy7yd9xHE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
