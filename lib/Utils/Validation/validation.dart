@@ -73,6 +73,9 @@ class FieldValidator {
 
   static String? validateNumberTravellers(String value) {
     if (value.isEmpty) return "Number of Travellers is required";
+    if (value.length > 4) {
+      return "Please Enter 4 or Less Digits";
+    }
 
     return null;
   }
@@ -96,6 +99,9 @@ class FieldValidator {
 
   static String? validateDurationTour(String value) {
     if (value.isEmpty) return "Duration of tour is required";
+    if (value.length > 3) {
+      return "Please Enter 3 or less digits";
+    }
 
     return null;
   }
@@ -108,6 +114,9 @@ class FieldValidator {
 
   static String? validateNumberPeople(String value) {
     if (value.isEmpty) return "Number of People is required";
+    if (value.length > 4) {
+      return "Please Enter only 4 or less digits";
+    }
 
     return null;
   }
@@ -150,19 +159,26 @@ class FieldValidator {
 
   static String? validateAdultsNumber(String value) {
     if (value.isEmpty) return "Number of adults is required";
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
 
     return null;
   }
 
   static String? validateNumberKids(String value) {
     if (value.isEmpty) return "Number of kids is required";
-
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
     return null;
   }
 
   static String? validateAccommodationNeeds1Field(String value) {
-    if (value.isEmpty) return "Accommodation Needs field is required";
-
+    if (value.isEmpty) return " Number of rooms field is required";
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
     return null;
   }
 
@@ -192,7 +208,9 @@ class FieldValidator {
 
   static String? validateCruiseLenth(String value) {
     if (value.isEmpty) return "Cruise length field is required";
-
+    if (value.length > 5) {
+      return "Please enter only 4 or less digits";
+    }
     return null;
   }
 
@@ -222,6 +240,9 @@ class FieldValidator {
 
   static String? validateCabinNumber(String value) {
     if (value.isEmpty) return "Cabin number field is required";
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
 
     return null;
   }
@@ -240,18 +261,27 @@ class FieldValidator {
 
   static String? validatePassangerNumber(String value) {
     if (value.isEmpty) return "Passangers number field is required";
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
 
     return null;
   }
 
   static String? validatePassangerAge(String value) {
     if (value.isEmpty) return "Passanger age field is required";
+    if (value.length > 4) {
+      return "Please enter only 4 or less digits";
+    }
 
     return null;
   }
 
   static String? validateBudgetPerNight(String value) {
     if (value.isEmpty) return "Budget per night field is required";
+    if (value.length > 7) {
+      return "Please enter only 4 or less digits";
+    }
 
     return null;
   }

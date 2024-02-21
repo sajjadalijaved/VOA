@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../../bloc/connectivity_bloc.dart';
@@ -17,10 +16,10 @@ import 'package:vacation_ownership_advisor/Screens/TabForms/car_rental_form.dart
 
 class CheckConnectivityTabsScreen extends StatelessWidget {
   dynamic userId;
-  CheckConnectivityTabsScreen({
-    Key? key,
-    required this.userId,
-  }) : super(key: key);
+  String getContactId;
+  CheckConnectivityTabsScreen(
+      {Key? key, required this.userId, required this.getContactId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +28,7 @@ class CheckConnectivityTabsScreen extends StatelessWidget {
         if (state is ConnectedState) {
           return TabsMainScreen(
             userId: userId,
+            getContactId: getContactId,
           );
         } else if (state is DisConnectedState) {
           return const NoConnectionPage();
@@ -42,10 +42,9 @@ class CheckConnectivityTabsScreen extends StatelessWidget {
 
 class TabsMainScreen extends StatefulWidget {
   dynamic userId;
-  TabsMainScreen({
-    Key? key,
-    required this.userId,
-  }) : super(key: key);
+  String getContactId;
+  TabsMainScreen({Key? key, required this.userId, required this.getContactId})
+      : super(key: key);
 
   @override
   State<TabsMainScreen> createState() => _TabsMainScreenState();
@@ -80,6 +79,7 @@ class _TabsMainScreenState extends State<TabsMainScreen>
               color: Color(0xFF0092ff),
             ),
             onPressed: () {
+              FocusScope.of(context).unfocus();
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
@@ -101,11 +101,11 @@ class _TabsMainScreenState extends State<TabsMainScreen>
           child: Flexible(
             child: TabBar(
                 indicatorSize: TabBarIndicatorSize.label,
-                isScrollable: true,
+                //isScrollable: true,
                 unselectedLabelColor: Colors.grey.shade600,
                 physics: const BouncingScrollPhysics(),
                 controller: _tabController,
-                tabAlignment: TabAlignment.start,
+                tabAlignment: TabAlignment.fill,
                 dividerColor: Colors.grey.shade500,
                 tabs: const [
                   FittedBox(
@@ -161,18 +161,23 @@ class _TabsMainScreenState extends State<TabsMainScreen>
       body: TabBarView(controller: _tabController, children: [
         HotelFormScreen(
           userId: widget.userId,
+          getContactId: widget.getContactId,
         ),
         CarRentalFormScreen(
           userId: widget.userId,
+          getContactId: widget.getContactId,
         ),
         AirFairFormScreen(
           userId: widget.userId,
+          getContactId: widget.getContactId,
         ),
         CruiseFormScreen(
           userId: widget.userId,
+          getContactId: widget.getContactId,
         ),
         ToursFormScreen(
           userId: widget.userId,
+          getContactId: widget.getContactId,
         )
       ]),
     );

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +14,6 @@ import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 import 'package:vacation_ownership_advisor/view_model/drop_down_view_model.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 
 // ignore_for_file: must_be_immutable
 
@@ -24,7 +21,8 @@ import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart'
 
 class CruiseFormScreen extends StatefulWidget {
   dynamic userId;
-  CruiseFormScreen({super.key, this.userId});
+  String getContactId;
+  CruiseFormScreen({super.key, this.userId, required this.getContactId});
 
   @override
   State<CruiseFormScreen> createState() => _CruiseFormScreenState();
@@ -34,10 +32,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  String? id;
-
-  String? getContact;
-  String? getContactCreatId;
+  late String getContact;
 
   DateTime? _saillingDate;
   DateTime? _returnDate;
@@ -45,7 +40,6 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
   late TextEditingController saillingDateController;
@@ -112,8 +106,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
 
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
-        id = latestData!.user_id.toString();
-        log("id : $id");
+
         email = latestData!.email.toString();
         log("email : $email");
       });
@@ -170,38 +163,11 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
-  }
-
   // contactId get through sharePreferences
-  contactIdRetriever() async {
+  Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    getContactCreatId = prefs.getString('contactId') ?? '';
-
-    log("Get getContactCreatId in CruiseScreen: $getContactCreatId");
+    String id = prefs.getString('contactId') ?? '';
+    return id;
   }
 
   @override
@@ -230,25 +196,15 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Cruise Screen: $getContact");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email.toString());
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Cruise Screen: $getContact");
       });
     }
   }
@@ -277,6 +233,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log("getContactId in Cruise Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -903,13 +860,13 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
 
                           await tabsViewModel.cruiseMethod(
                               context: context,
-                              id: id!.toString(),
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              id: widget.userId.toString(),
+                              userId: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               firstname: firstname,
                               email: email1,
                               mobile: mobile,

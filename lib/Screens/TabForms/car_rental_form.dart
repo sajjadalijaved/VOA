@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +11,6 @@ import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/error_controll_view_model.dart';
 import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
@@ -23,7 +20,8 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class CarRentalFormScreen extends StatefulWidget {
   dynamic userId;
-  CarRentalFormScreen({super.key, this.userId});
+  String getContactId;
+  CarRentalFormScreen({super.key, this.userId, required this.getContactId});
 
   @override
   State<CarRentalFormScreen> createState() => _CarRentalFormScreenState();
@@ -33,10 +31,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  String? id;
-
-  String? getContact;
-  String? getContactCreatId;
+  late String getContact;
 
   DateTime? _pickDate;
   DateTime? _dropDate;
@@ -44,7 +39,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
   TimeOfDay? pickTime;
@@ -87,27 +81,22 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
       GlobalKey<FormFieldState>();
 
 // contactId get through sharePreferences
-  contactIdRetriever() async {
+  Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    getContactCreatId = prefs.getString('contactId') ?? '';
+    String id = prefs.getString('contactId') ?? '';
 
-    log("Get getContactCreatId in carRentalScreen: $getContactCreatId");
+    return id;
   }
 
   // fetch data from database
   Future fetch() async {
     var models = await dataModelProvider.fetchData();
     if (models != null) {
-      log("Fetch method in hostel screen");
       setState(() {
         this.models = models;
         latestData = models.isNotEmpty ? models.last : null;
-
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
-        id = latestData!.user_id.toString();
-        log("name : $id");
-
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
         email = latestData!.email.toString();
@@ -192,32 +181,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -242,25 +205,15 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Car Rental Screen: $getContact");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Car Rental Screen: $getContact");
       });
     }
   }
@@ -283,6 +236,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
+    log("getContactId in Car Rental Screen:  ${widget.getContactId}");
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
         Provider.of<ErrorModelClass>(context, listen: false);
@@ -670,11 +624,11 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
 
                           // car rental method
                           await tabsViewModel.carRentalMethod(
-                              id: id!.toString(),
+                              id: widget.userId.toString(),
                               context: context,
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               firstname: firstname,
                               email: email1,
                               mobile: mobile,
@@ -686,9 +640,9 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                               preferredCompany: preferedCompany,
                               pickUpLocation: pickLocation,
                               dropOffLocation: dropLocation,
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              userId: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               additionalInformation: additionalInformation);
                           //  clear fields
                           dropLocationController.clear();

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +10,6 @@ import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/services/splash_services.dart';
 import 'package:vacation_ownership_advisor/view_model/error_controll_view_model.dart';
 import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
@@ -23,7 +20,8 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class HotelFormScreen extends StatefulWidget {
   dynamic userId;
-  HotelFormScreen({super.key, this.userId});
+  String getContactId;
+  HotelFormScreen({super.key, this.userId, required this.getContactId});
 
   @override
   State<HotelFormScreen> createState() => _HotelFormScreenState();
@@ -33,10 +31,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  String? id;
-  String? getContact;
-  String? getContactCreatId;
-  late String getContactCreatId1;
+  late String getContact;
 
   DateTime? _checkInDate;
   DateTime? _checkOutDate;
@@ -44,7 +39,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
   late TextEditingController checkInDateController;
@@ -87,14 +81,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   final GlobalKey<FormFieldState> mealFieldKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> budgetFieldKey = GlobalKey<FormFieldState>();
 
-  // save contactId
-  Future<String> contactIdSaver(String id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('contactId', id);
-
-    return 'saved';
-  }
-
   // fetch data from database
   Future fetch() async {
     var models = await dataModelProvider.fetchData();
@@ -102,14 +88,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     if (models != null) {
       setState(() {
         this.models = models;
-
         latestData = models.isNotEmpty ? models.last : null;
-
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
-        id = latestData!.user_id.toString();
-        log("user_id : $id");
-
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
         email = latestData!.email.toString();
@@ -163,32 +144,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
-  }
-
   // contactId get through sharePreferences
   Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -204,55 +159,15 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("get id from create method in hotel Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Hotel Screen: $getContact");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("get id from create method in hotel Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Hotel Screen: $getContact");
       });
     }
 
@@ -270,6 +185,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     mealController = TextEditingController();
     budgetController = TextEditingController();
     additionalFieldController = TextEditingController();
+
     // focus node
     checkInDate = FocusNode();
     checkOutDate = FocusNode();
@@ -299,6 +215,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log("getContactId in Hotel Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -603,6 +520,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                             validate: (value) {
                               return FieldValidator.validateAdultsNumber(value);
                             },
+                            onChanged: (value) {
+                              adultsFieldKey.currentState!.validate();
+                            },
                             hintText: "Adults Number",
                             fieldValidationkey: adultsFieldKey,
                             boderColor: const Color(0xff0092ff),
@@ -622,6 +542,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                             ],
                             validate: (value) {
                               return FieldValidator.validateNumberKids(value);
+                            },
+                            onChanged: (value) {
+                              kidsFieldKey.currentState!.validate();
                             },
                             hintText: "Kids Number",
                             fieldValidationkey: kidsFieldKey),
@@ -663,6 +586,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                             validate: (value) {
                               return FieldValidator
                                   .validateAccommodationNeeds1Field(value);
+                            },
+                            onChanged: (value) {
+                              accudation1FieldKey.currentState!.validate();
                             },
                             hintText: "Rooms Number",
                             fieldValidationkey: accudation1FieldKey),
@@ -741,11 +667,17 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.text,
-                    inputparameter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^[0-9\$]*$')),
-                    ],
                     validate: (value) {
-                      return FieldValidator.validateBudgetPerNight(value);
+                      if (value == null || value.isEmpty) {
+                        return "Budget cannot be empty.";
+                      } else if (!RegExp(r'^[0-9\$]*$').hasMatch(value)) {
+                        return "Invalid input: Only digits and \$ sign are allowed.";
+                      } else {
+                        return FieldValidator.validateBudgetPerNight(value);
+                      }
+                    },
+                    onChanged: (String value) {
+                      budgetFieldKey.currentState!.validate();
                     },
                     hintText: "\$5 ",
                     fieldValidationkey: budgetFieldKey),
@@ -845,13 +777,13 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               additionalFieldController.text.toString();
                           // hotel create method
                           tabsViewModel.ticketCreateMethod(
-                              id: id!.toString(),
+                              id: widget.userId.toString(),
                               context: context,
                               firstname: firstname,
                               email: email1,
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               mobile: mobile,
                               hostalName: hostalName,
                               checkInDate: checkInDate,
@@ -864,9 +796,9 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               kids: kids,
                               meal: meal,
                               budget: budget,
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              userId: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               numberroom: numberroom,
                               roomperfance: roomperfance,
                               additionalInformation: additionalInformation);

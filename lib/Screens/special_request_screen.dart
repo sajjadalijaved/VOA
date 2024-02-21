@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import '../modals/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +20,9 @@ import 'package:vacation_ownership_advisor/view_model/services/splash_services.d
 
 class SpecialRequestScreen extends StatefulWidget {
   dynamic userId;
-  SpecialRequestScreen({super.key, this.userId});
+  String getContactId;
+  SpecialRequestScreen(
+      {super.key, required this.userId, required this.getContactId});
 
   @override
   State<SpecialRequestScreen> createState() => _SpecialRequestScreenState();
@@ -32,10 +32,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-
-  String? getContact;
-  String? getContactCreatId;
-  String? getContactCreatId1;
+  late String getIdFromSaveMethod;
 
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
@@ -47,38 +44,11 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   final GlobalKey<FormState> key = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> specialFieldKey = GlobalKey<FormFieldState>();
 
-  // save contactId
-  Future<String> contactIdSaver(String id) async {
+  // contactId get through sharePreferences
+  Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('contactId', id);
-
-    return 'saved';
-  }
-
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
+    String id = prefs.getString('contactId') ?? '';
+    return id;
   }
 
   // fetch data from database
@@ -93,6 +63,8 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
 
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
+        id = latestData!.user_id.toString();
+        log("user_id : $id");
 
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
@@ -106,13 +78,6 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
     }
   }
 
-  // contactId get through sharePreferences
-  Future<String> contactIdRetriever() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String id = prefs.getString('contactId') ?? '';
-    return id;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -122,57 +87,15 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("get id from create method in Special Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
+        getIdFromSaveMethod = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method: $getIdFromSaveMethod");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!.toString());
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("get id from create method in Spleash Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
-            : getContactCreatId!.toString());
+        getIdFromSaveMethod = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method: $getIdFromSaveMethod");
       });
     }
   }
@@ -186,6 +109,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   @override
   Widget build(BuildContext context) {
     log("User_id in SpecialRequestScreen   : ${widget.userId}");
+    log("getContactId in SpecialRequestScreen   : ${widget.getContactId}");
     double height = MediaQuery.sizeOf(context).height;
     double width = MediaQuery.sizeOf(context).width;
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
@@ -309,12 +233,12 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
                               email: email1,
                               id: widget.userId.toString(),
                               mobile: mobile,
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getIdFromSaveMethod.toString()
+                                  : widget.getContactId.toString(),
+                              userId: widget.getContactId == null
+                                  ? getIdFromSaveMethod.toString()
+                                  : widget.getContactId.toString(),
                               specialRequestData: specialRequest);
                           specialFieldController.clear();
                         } else {

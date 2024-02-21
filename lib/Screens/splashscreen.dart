@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: FittedBox(
                     fit: BoxFit.contain,
                     child: Text(
-                      "VACATION ONWERSHIP ADVISOR",
+                      "VACATION OWNERSHIP ADVISOR",
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w500,

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +13,6 @@ import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 import 'package:vacation_ownership_advisor/view_model/drop_down_view_model.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 // ignore_for_file: must_be_immutable
@@ -24,7 +21,8 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class AirFairFormScreen extends StatefulWidget {
   dynamic userId;
-  AirFairFormScreen({super.key, this.userId});
+  String getContactId;
+  AirFairFormScreen({super.key, this.userId, required this.getContactId});
 
   @override
   State<AirFairFormScreen> createState() => _AirFairFormScreenState();
@@ -34,10 +32,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  String? id;
-
-  String? getContact;
-  String? getContactCreatId;
+  late String getContact;
 
   DateTime? _fromDate;
   DateTime? _toDate;
@@ -45,7 +40,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
   late TextEditingController fromLocationController;
@@ -91,8 +85,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
 
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
-        id = latestData!.user_id.toString();
-        log("name : $id");
 
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
@@ -146,38 +138,12 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
-  }
-
   // contactId get through sharePreferences
-  contactIdRetriever() async {
+  Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    getContactCreatId = prefs.getString('contactId') ?? '';
+    String id = prefs.getString('contactId') ?? '';
 
-    log("Get getContactCreatId in flights Screen: $getContactCreatId");
+    return id;
   }
 
   List dropDownListData = [
@@ -206,25 +172,15 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Flights Screen: $getContact");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email.toString());
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Flights Screen: $getContact");
       });
     }
   }
@@ -248,6 +204,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log("getContactId in Flights Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -674,12 +631,12 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               additionalFieldController.text.toString();
 
                           await tabsViewModel.airFairMethod(
-                              id: id!.toString(),
+                              id: widget.userId.toString(),
                               context: context,
                               firstname: firstname,
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               email: email1,
                               mobile: mobile,
                               type: dropDownViewModel.dropdownValueFlights,
@@ -690,9 +647,9 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               toLocation: toLocation,
                               preferredServices: preferedServices,
                               numberOfTravellers: numberTravellers,
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              userId: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               additionalInformation: additionalInformation);
                           dropDownViewModel.dropDownValueFlightsMethod = '';
                           fromLocationController.clear();

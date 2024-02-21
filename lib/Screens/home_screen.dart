@@ -1,18 +1,27 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart';
+import '../modals/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../bloc/connectivity_bloc.dart';
 import '../Utils/no_connection_page.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../Utils/routes/routesname.dart';
+import '../database/datamodel_provider.dart';
 import '../../view_model/user_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../repository/tab_bar_screens_auth.dart';
+import '../view_model/services/splash_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Screens/CallScreens/mapscreen.dart';
 import 'package:vacation_ownership_advisor/Screens/special_request_screen.dart';
 import 'package:vacation_ownership_advisor/Screens/TabForms/tabs_main_screen.dart';
+
+// ignore_for_file: unnecessary_null_comparison
+
 // ignore_for_file: deprecated_member_use
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
@@ -54,10 +63,140 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   dynamic currentBackPressTime;
+  String? firstName;
+  String? phoneNumber;
+  String? email;
+  String? getContact;
+  String? getContactCreatId;
+
+  List<DataModel>? models;
+  DataModelProvider dataModelProvider = DataModelProvider();
+  SplashServices splashServices = SplashServices();
+  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
+  DataModel? latestData;
 
   Future<void> clearContactId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('contactId');
+  }
+
+  // fetch data from database
+  Future fetch() async {
+    var models = await dataModelProvider.fetchData();
+    if (models != null) {
+      setState(() {
+        this.models = models;
+
+        latestData = models.isNotEmpty ? models.last : null;
+
+        firstName = latestData!.firstName.toString();
+        log("name : $firstName");
+
+        phoneNumber = latestData!.phoneNumber.toString();
+        log("phone : $phoneNumber");
+        email = latestData!.email.toString();
+        log("email : $email");
+      });
+    } else {
+      setState(() {
+        this.models = [];
+      });
+    }
+  }
+
+  Future getContactIdMethod({required String email}) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Zoho-oauthtoken $token",
+        "orgId": "753177605"
+      };
+
+      var response = await get(
+          Uri.parse(
+              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        log("Get ContactId Data : $data");
+        getContact = data['data'][0]['id'];
+
+        log("ContactId  : $getContact");
+      } else {
+        log("response statusCode :${response.statusCode}");
+      }
+    } catch (e) {
+      log("err0r : $e");
+    }
+  }
+
+  // save contactId
+  Future<String> contactIdSaver(String id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('contactId', id);
+
+    return 'saved';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.userId == null || widget.userId.isEmpty) {
+      splashServices.updateDataToDataBase(context).whenComplete(() {
+        fetch();
+      }).whenComplete(() async {
+        // accessToken method call
+        await tabsScreenAuth.tabsScreensAccessToken();
+      }).whenComplete(() async {
+        await getContactIdMethod(email: email!);
+      }).whenComplete(() async {
+        if (getContact == null) {
+          await tabsScreenAuth.contactCreateMethod(
+            email: email.toString(),
+            firstname: firstName.toString(),
+            mobile: phoneNumber.toString(),
+          );
+          log("New Recorde Add:");
+        } else {
+          log("Recorde already exists:");
+        }
+      }).whenComplete(() {
+        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("get ConntactId from create method in Home Screen:$getContactCreatId");
+      }).whenComplete(() async {
+        await contactIdSaver(getContactCreatId == null
+            ? getContact!.toString()
+            : getContactCreatId!.toString());
+      });
+    } else {
+      splashServices.sendUserDataToDataBase(context).whenComplete(() {
+        fetch();
+      }).whenComplete(() async {
+        // accessToken method call
+        await tabsScreenAuth.tabsScreensAccessToken();
+      }).whenComplete(() async {
+        await getContactIdMethod(email: email!);
+      }).whenComplete(() async {
+        if (getContact == null) {
+          await tabsScreenAuth.contactCreateMethod(
+            email: email.toString(),
+            firstname: firstName.toString(),
+            mobile: phoneNumber.toString(),
+          );
+          log("New Recorde Add:");
+        } else {
+          log("Recorde already exists:");
+        }
+      }).whenComplete(() {
+        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
+        log("Get ContactId from create method in Home Screen:$getContactCreatId");
+      }).whenComplete(() async {
+        await contactIdSaver(getContactCreatId == null
+            ? getContact!.toString()
+            : getContactCreatId!.toString());
+      });
+    }
   }
 
   @override
@@ -249,6 +388,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(
                             builder: (context) => CheckConnectivityTabsScreen(
                               userId: widget.userId,
+                              getContactId: getContactCreatId == null
+                                  ? getContact!
+                                  : getContactCreatId!,
                             ),
                           ),
                           (route) => false);
@@ -270,6 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(
                               builder: (context) => SpecialRequestScreen(
                                     userId: widget.userId,
+                                    getContactId: getContactCreatId == null
+                                        ? getContact!
+                                        : getContactCreatId!,
                                   )),
                           (route) => false);
                     },

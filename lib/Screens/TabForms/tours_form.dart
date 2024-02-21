@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +13,6 @@ import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 
 // ignore_for_file: must_be_immutable
 
@@ -23,7 +20,8 @@ import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart'
 
 class ToursFormScreen extends StatefulWidget {
   dynamic userId;
-  ToursFormScreen({super.key, this.userId});
+  String getContactId;
+  ToursFormScreen({super.key, this.userId, required this.getContactId});
 
   @override
   State<ToursFormScreen> createState() => _ToursFormScreenState();
@@ -33,10 +31,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  String? id;
-
-  String? getContact;
-  String? getContactCreatId;
+  late String getContact;
 
   DateTime? _startingDate;
   DateTime? _endingDate;
@@ -44,7 +39,6 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
   late TextEditingController typeofToursController;
@@ -86,16 +80,11 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   Future fetch() async {
     var models = await dataModelProvider.fetchData();
     if (models != null) {
-      log("Fetch method in hostel screen");
       setState(() {
         this.models = models;
         latestData = models.isNotEmpty ? models.last : null;
-
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
-        id = latestData!.user_id.toString();
-        log("name : $id");
-
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
         email = latestData!.email.toString();
@@ -149,38 +138,11 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": "Zoho-oauthtoken $token",
-        "orgId": "753177605"
-      };
-
-      var response = await get(
-          Uri.parse(
-              "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
-          headers: headers);
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-        log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-
-        log("ContactId  : $getContact");
-      } else {
-        log("response statusCode :${response.statusCode}");
-      }
-    } catch (e) {
-      log("err0r : $e");
-    }
-  }
-
   // contactId get through sharePreferences
-  contactIdRetriever() async {
+  Future<String> contactIdRetriever() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    getContactCreatId = prefs.getString('contactId') ?? '';
-
-    log("Get getContactCreatId in TourScreen: $getContactCreatId");
+    String id = prefs.getString('contactId') ?? '';
+    return id;
   }
 
   @override
@@ -205,25 +167,15 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Tour Screen: $getContact");
       });
     } else {
       splashServices.sendUserDataToDataBase(context).whenComplete(() {
         fetch();
       }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        // searchEmail method call
-        await getContactIdMethod(email: email.toString());
-      }).whenComplete(() {
-        contactIdRetriever();
+        getContact = await contactIdRetriever();
+        log("Get Contact Id From ContactRetriver Method Tour Screen: $getContact");
       });
     }
   }
@@ -248,6 +200,8 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log("user_id in Tour Screen:${widget.userId}");
+    log("getContactId in Tour Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -554,11 +508,17 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.text,
-                    inputparameter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^[0-9\$]*$')),
-                    ],
                     validate: (value) {
-                      return FieldValidator.validateBudgetPerNight(value);
+                      if (value == null || value.isEmpty) {
+                        return "Budget cannot be empty.";
+                      } else if (!RegExp(r'^[0-9\$]*$').hasMatch(value)) {
+                        return "Invalid input:Only digits and \$ sign are allowed.";
+                      } else {
+                        return FieldValidator.validateBudgetPerNight(value);
+                      }
+                    },
+                    onChanged: (String value) {
+                      budgetFieldKey.currentState!.validate();
                     },
                     hintText: "\$",
                     fieldValidationkey: budgetFieldKey),
@@ -659,13 +619,13 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                               additionalFieldController.text.toString();
 
                           await tabsViewModel.toursMethod(
-                              id: id!.toString(),
+                              id: widget.userId.toString(),
                               context: context,
                               firstname: firstname,
                               email: email1,
-                              contactid: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              contactid: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               mobile: mobile,
                               typeTour: typeofTour,
                               startDate: statDate,
@@ -676,9 +636,9 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                               numberPeople: numberofpeople,
                               destinationTour: destinationTour,
                               budgetTour: budget,
-                              userId: getContact == null
-                                  ? getContactCreatId!.toString()
-                                  : getContact.toString(),
+                              userId: widget.getContactId == null
+                                  ? getContact.toString()
+                                  : widget.getContactId.toString(),
                               additionalInformation: additionalInformation);
 
                           // controler clear
