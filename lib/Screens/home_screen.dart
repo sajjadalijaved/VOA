@@ -425,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         barrierDismissible: false,
                         builder: (BuildContext context) {
                           return WillPopScope(
-                            onWillPop: () async => false, // Disable back button
+                            onWillPop: () async => false,
                             child: const Center(
                               child: CircularProgressIndicator(),
                             ),

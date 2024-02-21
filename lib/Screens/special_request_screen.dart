@@ -11,7 +11,6 @@ import 'package:vacation_ownership_advisor/Utils/utils.dart';
 import 'package:vacation_ownership_advisor/Screens/home_screen.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/repository/tab_bar_screens_auth.dart';
 import 'package:vacation_ownership_advisor/view_model/services/splash_services.dart';
 
 // ignore_for_file: must_be_immutable
@@ -39,7 +38,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   List<DataModel>? models;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
-  TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
+
   DataModel? latestData;
   late TextEditingController specialFieldController;
 
@@ -65,8 +64,6 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
 
         firstName = latestData!.firstName.toString();
         log("name : $firstName");
-        id = latestData!.user_id.toString();
-        log("user_id : $id");
 
         phoneNumber = latestData!.phoneNumber.toString();
         log("phone : $phoneNumber");
@@ -154,21 +151,25 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
               SizedBox(
                 height: height * 0.04,
               ),
-              Padding(
-                padding: EdgeInsets.only(left: width * 0.05),
-                child: const Text(
-                  "Special Request Information",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500),
+              FadeInUp(
+                delay: const Duration(milliseconds: 1000),
+                duration: const Duration(milliseconds: 1000),
+                child: Padding(
+                  padding: EdgeInsets.only(left: width * 0.05),
+                  child: const Text(
+                    "Special Request Information",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
+                  ),
                 ),
               ),
               const SizedBox(
                 height: 5,
               ),
               FadeInUp(
-                delay: const Duration(milliseconds: 1000),
+                delay: const Duration(milliseconds: 1200),
                 duration: const Duration(milliseconds: 1000),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
@@ -212,7 +213,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
                 height: height * 0.04,
               ),
               FadeInUp(
-                delay: const Duration(milliseconds: 1200),
+                delay: const Duration(milliseconds: 1400),
                 duration: const Duration(milliseconds: 1000),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: width * 0.06),
@@ -235,13 +236,13 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
                               email: email1,
                               id: widget.userId.toString(),
                               mobile: mobile,
-                              contactid: getIdFromSaveMethod.toString(),
-                              userId: getIdFromSaveMethod.toString(),
+                              contactid: getIdFromSaveMethod,
+                              userId: getIdFromSaveMethod,
                               specialRequestData: specialRequest);
                           specialFieldController.clear();
                         } else {
                           Utils.errorMessageFlush(
-                              "Please fill  Required Fields", context);
+                              "Please fill  Required Field", context);
                         }
                       },
                       title: "Submit"),
