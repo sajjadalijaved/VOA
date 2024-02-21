@@ -57,8 +57,11 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
   late TextEditingController numberOfPassengersController;
   late TextEditingController passengersAgeController;
   late TextEditingController additionalFieldController;
+
+  // focus node
   late FocusNode returnDateFocusNode;
   late FocusNode sailingDateFocusNode;
+  late FocusNode lenthFocusNode;
 
   // global keys
   final GlobalKey<FormState> key = GlobalKey<FormState>();
@@ -191,6 +194,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
 // focus node
     returnDateFocusNode = FocusNode();
     sailingDateFocusNode = FocusNode();
+    lenthFocusNode = FocusNode();
 
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {
@@ -228,6 +232,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
     // focus node dispose
     returnDateFocusNode.dispose();
     sailingDateFocusNode.dispose();
+    lenthFocusNode.dispose();
     super.dispose();
   }
 
@@ -249,9 +254,6 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.height * 0.02,
-                ),
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
@@ -270,7 +272,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     padding:
                         EdgeInsets.symmetric(horizontal: size.width * 0.05),
                     child: DropdownButtonFormField<String>(
-                        isDense: false,
+                        isDense: true,
                         iconSize: 30,
                         key: typeOfCruiseFieldKey,
                         decoration: InputDecoration(
@@ -371,6 +373,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   builder: (context, value, child) => CustomTextField(
                       boderColor: value.sailingDateFieldColor,
                       onTap: () {
+                        sailingDateFocusNode.attach(context);
                         value.setSailingDateFieldColor(const Color(0xff0092ff));
                         value.setReturnDateFieldColor(Colors.black26);
                         if (context != null) {
@@ -379,6 +382,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                         sailingDateMethod(context);
                       },
                       controller: saillingDateController,
+                      readonly: true,
                       inputparameter: [DateInputFormatter()],
                       validate: (value) {
                         return FieldValidator.validateDate(value);
@@ -413,14 +417,15 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     builder: (context, value, child) => CustomTextField(
                         boderColor: value.returnDateFieldColor,
                         onTap: () {
+                          returnDateFocusNode.attach(context);
                           value.setSailingDateFieldColor(Colors.black26);
                           value
                               .setReturnDateFieldColor(const Color(0xff0092ff));
                           if (_saillingDate == null) {
                             errorModelClass
-                                .setErrorText("First Fill Sailing Date");
+                                .setErrorCruiseText("First Fill Sailing Date");
                           } else {
-                            errorModelClass.setErrorText("");
+                            errorModelClass.setErrorCruiseText("");
                           }
 
                           if (context != null) {
@@ -429,8 +434,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                           returnDateMethod(context);
                         },
                         controller: returnDateController,
-                        errorText: errorModelClass.errorText.isNotEmpty
-                            ? errorModelClass.errorText
+                        readonly: true,
+                        errorText: errorModelClass.errorCruiseText.isNotEmpty
+                            ? errorModelClass.errorCruiseText
                             : null,
                         sufixIcon: Icon(
                           Icons.calendar_today_sharp,
@@ -463,6 +469,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
+                      lenthFocusNode.attach(context);
                       textFieldColorChangeViewModel
                           .setReturnDateFieldColor(Colors.black26);
                     },
@@ -475,6 +482,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                       return FieldValidator.validateCruiseLenth(value);
                     },
                     hintText: "Enter Number Of Nights",
+                    focusNode: lenthFocusNode,
                     fieldValidationkey: lenthOfCruiseFieldKey),
                 const SizedBox(
                   height: 6,

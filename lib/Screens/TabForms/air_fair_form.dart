@@ -54,6 +54,8 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
   // focus node
   late FocusNode fromDate;
   late FocusNode toDate;
+  late FocusNode toLocation;
+  late FocusNode travellersDate;
 
   // global keys
   final GlobalKey<FormState> key = GlobalKey<FormState>();
@@ -167,6 +169,8 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
     // focus node
     fromDate = FocusNode();
     toDate = FocusNode();
+    toLocation = FocusNode();
+    travellersDate = FocusNode();
 
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {
@@ -199,6 +203,8 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
     // focus node
     fromDate.dispose();
     toDate.dispose();
+    toLocation.dispose();
+    travellersDate.dispose();
     super.dispose();
   }
 
@@ -220,9 +226,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.height * 0.02,
-                ),
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
@@ -242,7 +245,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                         EdgeInsets.symmetric(horizontal: size.width * 0.05),
                     child: DropdownButtonFormField<String>(
                         key: dropDownFieldKey,
-                        isDense: false,
+                        isDense: true,
                         iconSize: 30,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
@@ -309,7 +312,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -335,6 +338,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                           child: CustomTextField(
                               boderColor: value.fromDateColor,
                               onTap: () {
+                                fromDate.attach(context);
                                 value.setToDateFieldColor(Colors.black26);
                                 value.setFromDateFieldColor(
                                     const Color(0xff0092ff));
@@ -356,6 +360,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               },
                               hintText: "From Date",
                               focusNode: fromDate,
+                              readonly: true,
                               fieldValidationkey: fromDateFieldKey),
                         ),
                       ),
@@ -376,7 +381,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -385,6 +390,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                       Expanded(
                         child: CustomTextField(
                             onTap: () {
+                              toLocation.attach(context);
                               textFieldColorChangeViewModel
                                   .setFromDateFieldColor(Colors.black26);
                             },
@@ -398,6 +404,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               return FieldValidator.validateLocation(value);
                             },
                             hintText: "Airport Location",
+                            focusNode: toLocation,
                             fieldValidationkey: toLocationFieldKey),
                       ),
                       Consumer<ErrorModelClass>(
@@ -407,14 +414,15 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.toFieldColor,
                                 onTap: () {
+                                  toDate.attach(context);
                                   value.setFromDateFieldColor(Colors.black26);
                                   value.setToDateFieldColor(
                                       const Color(0xff0092ff));
                                   if (_fromDate == null) {
-                                    errorModelClass
-                                        .setErrorText("First Fill From Date");
+                                    errorModelClass.setErrorFlightsText(
+                                        "First Fill From Date");
                                   } else {
-                                    errorModelClass.setErrorText("");
+                                    errorModelClass.setErrorFlightsText("");
                                   }
 
                                   if (context != null) {
@@ -424,9 +432,10 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                                   toDateMethod(context);
                                 },
                                 controller: toDateController,
-                                errorText: errorModelClass.errorText.isNotEmpty
-                                    ? errorModelClass.errorText
-                                    : null,
+                                errorText:
+                                    errorModelClass.errorFlightsText.isNotEmpty
+                                        ? errorModelClass.errorFlightsText
+                                        : null,
                                 paddingLeft: size.width * 0.01,
                                 inputparameter: [DateInputFormatter()],
                                 sufixIcon: Icon(
@@ -438,6 +447,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                                 },
                                 hintText: "To Date",
                                 focusNode: toDate,
+                                readonly: true,
                                 fieldValidationkey: toDateFieldKey),
                           ),
                         ),
@@ -463,6 +473,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
+                      travellersDate.attach(context);
                       textFieldColorChangeViewModel
                           .setToDateFieldColor(Colors.black26);
                     },
@@ -476,6 +487,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                       return FieldValidator.validateNumberTravellers(value);
                     },
                     hintText: "Enter Number Of Travellers ",
+                    focusNode: travellersDate,
                     fieldValidationkey: numberTravellersFieldKey),
                 const SizedBox(
                   height: 6,

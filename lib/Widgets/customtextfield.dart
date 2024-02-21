@@ -51,11 +51,13 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.sizeOf(context).width;
+    Size size = MediaQuery.sizeOf(context);
     return Padding(
       padding: EdgeInsets.only(
-          left: paddingLeft ?? width * .05, right: paddingRight ?? width * .05),
+          left: paddingLeft ?? size.width * .05,
+          right: paddingRight ?? size.width * .05),
       child: TextFormField(
+        textAlignVertical: TextAlignVertical.center,
         readOnly: readonly,
         inputFormatters: inputparameter,
         textCapitalization: textCapitalization,
@@ -73,8 +75,10 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
           errorText: errorText,
           hintText: hintText,
+
+          isDense: true,
           filled: true,
-          // fillColor: Colors.white,
+          //fillColor: Colors.white,
           hintStyle: const TextStyle(color: Color(0xFF97989e)),
           prefixIcon: prefixIcon,
           suffixIcon: sufixIcon,

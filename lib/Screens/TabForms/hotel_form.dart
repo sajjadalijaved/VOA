@@ -59,6 +59,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   // focus node
   late FocusNode checkInDate;
   late FocusNode checkOutDate;
+  late FocusNode state;
 
   // global keys
   final GlobalKey<FormState> key = GlobalKey<FormState>();
@@ -189,6 +190,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     // focus node
     checkInDate = FocusNode();
     checkOutDate = FocusNode();
+    state = FocusNode();
   }
 
   @override
@@ -210,6 +212,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     // focus node
     checkInDate.dispose();
     checkOutDate.dispose();
+    state.dispose();
     super.dispose();
   }
 
@@ -229,9 +232,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.height * 0.02,
-                ),
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
@@ -243,7 +243,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -253,13 +253,11 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                         builder: (context, value, child) => Expanded(
                           child: CustomTextField(
                               onTap: () {
+                                checkInDate.attach(context);
                                 value.setCheckOUtFieldColor(Colors.black26);
                                 value.setCheckInFieldColor(
                                     const Color(0xff0092ff));
-                                if (context != null) {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                }
+
                                 checkInDateMethod(context);
                               },
                               paddingLeft: size.width * 0.05,
@@ -273,9 +271,11 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               sufixIcon: Icon(
                                 Icons.calendar_today_sharp,
                                 color: value.checkInFieldColor,
+                                size: 20,
                               ),
                               textInputType: TextInputType.datetime,
                               hintText: "Check In",
+                              readonly: true,
                               boderColor: value.checkInFieldColor,
                               fieldValidationkey: checkInDateFieldKey),
                         ),
@@ -287,6 +287,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.checkOutFieldColor,
                                 onTap: () {
+                                  checkInDate.attach(context);
                                   value.setCheckInFieldColor(Colors.black26);
 
                                   value.setCheckOUtFieldColor(
@@ -297,11 +298,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                                   } else {
                                     errorModelClass.setErrorText("");
                                   }
-
-                                  if (context != null) {
-                                    FocusScope.of(context)
-                                        .requestFocus(FocusNode());
-                                  }
                                   checkOutDateMethod(context);
                                 },
                                 paddingLeft: size.width * 0.01,
@@ -310,6 +306,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                                 sufixIcon: Icon(
                                   Icons.calendar_today_sharp,
                                   color: value.checkOutFieldColor,
+                                  size: 20,
                                 ),
                                 focusNode: checkOutDate,
                                 errorText: errorModelClass.errorText.isNotEmpty
@@ -345,7 +342,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -354,6 +351,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                       Expanded(
                         child: CustomTextField(
                             onTap: () {
+                              state.attach(context);
                               textFieldColorChangeViewModel
                                   .setCheckOUtFieldColor(Colors.black26);
                             },
@@ -371,6 +369,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               return FieldValidator.validateStateName(value);
                             },
                             hintText: "Enter State Name",
+                            focusNode: state,
                             fieldValidationkey: stateFieldKey),
                       ),
                       Expanded(
@@ -412,7 +411,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     hintText: "Enter Country Name",
                     fieldValidationkey: countryFieldKey),
                 const SizedBox(
-                  height: 6,
+                  height: 4,
                 ),
                 Padding(
                   padding: EdgeInsets.only(
@@ -433,6 +432,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                     keyboardType: TextInputType.streetAddress,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
+                      isDense: true,
                       hintText: "Enter Your Address",
                       filled: true,
                       hintStyle: const TextStyle(color: Color(0xFF97989e)),
@@ -469,7 +469,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 CustomTextField(
                   controller: hotelNameController,
@@ -500,7 +500,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -566,7 +566,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 SizedBox(
                   width: size.width,
@@ -629,7 +629,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 CustomTextField(
                     boderColor: const Color(0xff0092ff),
@@ -659,7 +659,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 CustomTextField(
                     boderColor: const Color(0xff0092ff),
@@ -693,7 +693,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(

@@ -55,6 +55,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   // focus node
   late FocusNode endDateFocusNode;
   late FocusNode startDateFocusNode;
+  late FocusNode peopleFocusNode;
 
   // global keys
   final GlobalKey<FormState> key = GlobalKey<FormState>();
@@ -162,6 +163,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
     //focus node
     endDateFocusNode = FocusNode();
     startDateFocusNode = FocusNode();
+    peopleFocusNode = FocusNode();
 
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {
@@ -195,6 +197,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
     // focus node
     endDateFocusNode.dispose();
     startDateFocusNode.dispose();
+    peopleFocusNode.dispose();
     super.dispose();
   }
 
@@ -215,9 +218,6 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.height * 0.02,
-                ),
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
@@ -323,6 +323,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   builder: (context, value, child) => CustomTextField(
                       boderColor: value.startDateFieldColor,
                       onTap: () {
+                        startDateFocusNode.attach(context);
                         value.setStartDateFieldColor(const Color(0xff0092ff));
                         value.setEndingDateFieldColor(Colors.black26);
                         if (context != null) {
@@ -341,6 +342,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                         color: value.startDateFieldColor,
                       ),
                       hintText: "Enter Starting Date Of Tour",
+                      readonly: true,
                       fieldValidationkey: startedDateFieldKey),
                 ),
                 const SizedBox(
@@ -365,14 +367,15 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     builder: (context, value, child) => CustomTextField(
                         boderColor: value.endingDateFieldColor,
                         onTap: () {
+                          endDateFocusNode.attach(context);
                           value
                               .setEndingDateFieldColor(const Color(0xff0092ff));
                           value.setStartDateFieldColor(Colors.black26);
                           if (_startingDate == null) {
                             errorModelClass
-                                .setErrorText("First Fill Starting Date");
+                                .setErrorTourText("First Fill Starting Date");
                           } else {
-                            errorModelClass.setErrorText("");
+                            errorModelClass.setErrorTourText("");
                           }
 
                           if (context != null) {
@@ -382,8 +385,9 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                         },
                         controller: endingDateController,
                         focusNode: endDateFocusNode,
-                        errorText: errorModelClass.errorText.isNotEmpty
-                            ? errorModelClass.errorText
+                        readonly: true,
+                        errorText: errorModelClass.errorTourText.isNotEmpty
+                            ? errorModelClass.errorTourText
                             : null,
                         sufixIcon: Icon(
                           Icons.calendar_today_sharp,
@@ -415,6 +419,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
+                      peopleFocusNode.attach(context);
                       textFieldColorChangeViewModel
                           .setEndingDateFieldColor(Colors.black26);
                     },
@@ -423,6 +428,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.number,
+                    focusNode: peopleFocusNode,
                     inputparameter: [FilteringTextInputFormatter.digitsOnly],
                     validate: (value) {
                       return FieldValidator.validateNumberPeople(value);

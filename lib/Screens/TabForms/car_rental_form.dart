@@ -60,6 +60,8 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   late FocusNode dropOffDate;
   late FocusNode pickUpTime;
   late FocusNode dropOffTime;
+  late FocusNode dropLocation;
+  late FocusNode typeCar;
 
   // global keys
   final GlobalKey<FormState> key = GlobalKey<FormState>();
@@ -200,6 +202,8 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     dropOffDate = FocusNode();
     pickUpTime = FocusNode();
     dropOffTime = FocusNode();
+    dropLocation = FocusNode();
+    typeCar = FocusNode();
 
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {
@@ -230,6 +234,13 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     preferedCompanyController.dispose();
     budgetController.dispose();
     additionalFieldController.dispose();
+
+    pickUpDate.dispose();
+    pickUpTime.dispose();
+    dropLocation.dispose();
+    dropOffDate.dispose();
+    dropOffTime.dispose();
+    typeCar.dispose();
     super.dispose();
   }
 
@@ -249,9 +260,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.height * 0.02,
-                ),
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
@@ -263,7 +271,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 CustomTextField(
                     boderColor: const Color(0xff0092ff),
@@ -288,6 +296,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.pickDateFieldColor,
                               onTap: () {
+                                pickUpDate.attach(context);
                                 value.setPickTimeFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setDropTimeFieldColor(Colors.black26);
@@ -313,6 +322,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                               ),
                               inputAction: TextInputAction.none,
                               hintText: "Pickup Date",
+                              readonly: true,
                               fieldValidationkey: pickDateFieldKey),
                         ),
                       ),
@@ -321,6 +331,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.pickTimeFieldColor,
                               onTap: () {
+                                pickUpTime.attach(context);
                                 value.setPickDateFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setDropTimeFieldColor(Colors.black26);
@@ -332,6 +343,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                 }
                                 pickTimeMethod(context);
                               },
+                              readonly: true,
                               paddingLeft: size.width * 0.01,
                               controller: pickTimeController,
                               focusNode: pickUpTime,
@@ -363,10 +375,11 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 4,
                 ),
                 CustomTextField(
                     onTap: () {
+                      dropLocation.attach(context);
                       textFieldColorChangeViewModel
                           .setPickTimeFieldColor(Colors.black26);
                       textFieldColorChangeViewModel
@@ -381,6 +394,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                       return FieldValidator.validateLocation(value);
                     },
                     hintText: "Enter Dropoff Location",
+                    focusNode: dropLocation,
                     fieldValidationkey: dropLocationFieldKey),
                 const SizedBox(
                   height: 8,
@@ -396,16 +410,17 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.dropDateColor,
                                 onTap: () {
+                                  dropOffDate.attach(context);
                                   value.setPickTimeFieldColor(Colors.black26);
                                   value.setPickDateFieldColor(Colors.black26);
                                   value.setDropTimeFieldColor(Colors.black26);
                                   value.setDropDateFieldColor(
                                       const Color(0xff0092ff));
                                   if (_pickDate == null) {
-                                    errorModelClass
-                                        .setErrorText("First Fill PickUp Date");
+                                    errorModelClass.setErrorCarText(
+                                        "First Fill PickUp Date");
                                   } else {
-                                    errorModelClass.setErrorText("");
+                                    errorModelClass.setErrorCarText("");
                                   }
 
                                   if (context != null) {
@@ -417,9 +432,11 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                 paddingRight: size.width * 0.01,
                                 controller: dropDateController,
                                 focusNode: dropOffDate,
-                                errorText: errorModelClass.errorText.isNotEmpty
-                                    ? errorModelClass.errorText
-                                    : null,
+                                readonly: true,
+                                errorText:
+                                    errorModelClass.errorCarText.isNotEmpty
+                                        ? errorModelClass.errorCarText
+                                        : null,
                                 inputparameter: [DateInputFormatter()],
                                 validate: (value) {
                                   return FieldValidator.validateDate(value);
@@ -438,6 +455,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.dropTimeFieldColor,
                               onTap: () {
+                                dropOffTime.attach(context);
                                 value.setPickTimeFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setPickDateFieldColor(Colors.black26);
@@ -459,6 +477,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                 return FieldValidator.validateTime(value);
                               },
                               hintText: "Drop Time",
+                              readonly: true,
                               focusNode: dropOffTime,
                               fieldValidationkey: dropTimeFieldKey),
                         ),
@@ -484,6 +503,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
+                      typeCar.attach(context);
                       textFieldColorChangeViewModel
                           .setDropTimeFieldColor(Colors.black26);
                       textFieldColorChangeViewModel
@@ -494,6 +514,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                     textCapitalization: TextCapitalization.words,
                     inputAction: TextInputAction.next,
                     textInputType: TextInputType.text,
+                    focusNode: typeCar,
                     inputparameter: [
                       FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))
                     ],

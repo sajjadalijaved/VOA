@@ -145,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Timer(const Duration(seconds: 2), () {
       const CircularProgressIndicator(
         strokeWidth: 5,
+        color: Colors.black,
       );
     });
 
