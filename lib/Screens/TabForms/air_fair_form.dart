@@ -21,8 +21,11 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class AirFairFormScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  AirFairFormScreen({super.key, this.userId, required this.getContactId});
+
+  AirFairFormScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<AirFairFormScreen> createState() => _AirFairFormScreenState();
@@ -210,7 +213,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log("getContactId in Flights Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -338,14 +340,10 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                           child: CustomTextField(
                               boderColor: value.fromDateColor,
                               onTap: () {
-                                fromDate.attach(context);
                                 value.setToDateFieldColor(Colors.black26);
                                 value.setFromDateFieldColor(
                                     const Color(0xff0092ff));
-                                if (context != null) {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                }
+
                                 fromDateMethod(context);
                               },
                               paddingLeft: size.width * 0.01,
@@ -390,7 +388,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                       Expanded(
                         child: CustomTextField(
                             onTap: () {
-                              toLocation.attach(context);
                               textFieldColorChangeViewModel
                                   .setFromDateFieldColor(Colors.black26);
                             },
@@ -414,7 +411,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.toFieldColor,
                                 onTap: () {
-                                  toDate.attach(context);
                                   value.setFromDateFieldColor(Colors.black26);
                                   value.setToDateFieldColor(
                                       const Color(0xff0092ff));
@@ -425,10 +421,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                                     errorModelClass.setErrorFlightsText("");
                                   }
 
-                                  if (context != null) {
-                                    FocusScope.of(context)
-                                        .requestFocus(FocusNode());
-                                  }
                                   toDateMethod(context);
                                 },
                                 controller: toDateController,
@@ -473,7 +465,6 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
-                      travellersDate.attach(context);
                       textFieldColorChangeViewModel
                           .setToDateFieldColor(Colors.black26);
                     },
@@ -488,6 +479,9 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                     },
                     hintText: "Enter Number Of Travellers ",
                     focusNode: travellersDate,
+                    onChanged: (value) {
+                      numberTravellersFieldKey.currentState!.validate();
+                    },
                     fieldValidationkey: numberTravellersFieldKey),
                 const SizedBox(
                   height: 6,
@@ -646,9 +640,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               id: widget.userId.toString(),
                               context: context,
                               firstname: firstname,
-                              contactid: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              contactid: getContact.toString(),
                               email: email1,
                               mobile: mobile,
                               type: dropDownViewModel.dropdownValueFlights,
@@ -659,9 +651,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                               toLocation: toLocation,
                               preferredServices: preferedServices,
                               numberOfTravellers: numberTravellers,
-                              userId: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              userId: getContact.toString(),
                               additionalInformation: additionalInformation);
                           dropDownViewModel.dropDownValueFlightsMethod = '';
                           fromLocationController.clear();

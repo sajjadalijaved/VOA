@@ -20,9 +20,11 @@ import 'package:vacation_ownership_advisor/view_model/services/splash_services.d
 
 class SpecialRequestScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  SpecialRequestScreen(
-      {super.key, required this.userId, required this.getContactId});
+
+  SpecialRequestScreen({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<SpecialRequestScreen> createState() => _SpecialRequestScreenState();
@@ -109,7 +111,7 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   @override
   Widget build(BuildContext context) {
     log("User_id in SpecialRequestScreen   : ${widget.userId}");
-    log("getContactId in SpecialRequestScreen   : ${widget.getContactId}");
+
     double height = MediaQuery.sizeOf(context).height;
     double width = MediaQuery.sizeOf(context).width;
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
@@ -233,12 +235,8 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
                               email: email1,
                               id: widget.userId.toString(),
                               mobile: mobile,
-                              contactid: widget.getContactId == null
-                                  ? getIdFromSaveMethod.toString()
-                                  : widget.getContactId.toString(),
-                              userId: widget.getContactId == null
-                                  ? getIdFromSaveMethod.toString()
-                                  : widget.getContactId.toString(),
+                              contactid: getIdFromSaveMethod.toString(),
+                              userId: getIdFromSaveMethod.toString(),
                               specialRequestData: specialRequest);
                           specialFieldController.clear();
                         } else {

@@ -15,10 +15,11 @@ import 'package:vacation_ownership_advisor/Screens/TabForms/car_rental_form.dart
 
 class CheckConnectivityTabsScreen extends StatelessWidget {
   dynamic userId;
-  String getContactId;
-  CheckConnectivityTabsScreen(
-      {Key? key, required this.userId, required this.getContactId})
-      : super(key: key);
+
+  CheckConnectivityTabsScreen({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,6 @@ class CheckConnectivityTabsScreen extends StatelessWidget {
         if (state is ConnectedState) {
           return TabsMainScreen(
             userId: userId,
-            getContactId: getContactId,
           );
         } else if (state is DisConnectedState) {
           return const NoConnectionPage();
@@ -41,9 +41,11 @@ class CheckConnectivityTabsScreen extends StatelessWidget {
 
 class TabsMainScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  TabsMainScreen({Key? key, required this.userId, required this.getContactId})
-      : super(key: key);
+
+  TabsMainScreen({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<TabsMainScreen> createState() => _TabsMainScreenState();
@@ -51,7 +53,7 @@ class TabsMainScreen extends StatefulWidget {
 
 class _TabsMainScreenState extends State<TabsMainScreen>
     with TickerProviderStateMixin {
-  late TabController _tabController;
+  late PageController _pageController;
   int currentIndex = 0;
   List<String> name = [
     "Hotel",
@@ -63,13 +65,13 @@ class _TabsMainScreenState extends State<TabsMainScreen>
 
   @override
   void initState() {
-    _tabController = TabController(length: 5, vsync: this);
+    _pageController = PageController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -185,7 +187,11 @@ class _TabsMainScreenState extends State<TabsMainScreen>
                           onTap: () {
                             setState(() {
                               currentIndex = index;
-                              _tabController.animateTo(currentIndex);
+                              _pageController.animateToPage(
+                                currentIndex,
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeInOut,
+                              );
                             });
                           },
                           child: AnimatedContainer(
@@ -233,28 +239,30 @@ class _TabsMainScreenState extends State<TabsMainScreen>
                 ),
               ),
               Expanded(
-                child: TabBarView(controller: _tabController, children: [
-                  HotelFormScreen(
-                    userId: widget.userId,
-                    getContactId: widget.getContactId,
-                  ),
-                  CarRentalFormScreen(
-                    userId: widget.userId,
-                    getContactId: widget.getContactId,
-                  ),
-                  AirFairFormScreen(
-                    userId: widget.userId,
-                    getContactId: widget.getContactId,
-                  ),
-                  CruiseFormScreen(
-                    userId: widget.userId,
-                    getContactId: widget.getContactId,
-                  ),
-                  ToursFormScreen(
-                    userId: widget.userId,
-                    getContactId: widget.getContactId,
-                  )
-                ]),
+                child: PageView(
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentIndex = index;
+                      });
+                    },
+                    controller: _pageController,
+                    children: [
+                      HotelFormScreen(
+                        userId: widget.userId,
+                      ),
+                      CarRentalFormScreen(
+                        userId: widget.userId,
+                      ),
+                      AirFairFormScreen(
+                        userId: widget.userId,
+                      ),
+                      CruiseFormScreen(
+                        userId: widget.userId,
+                      ),
+                      ToursFormScreen(
+                        userId: widget.userId,
+                      )
+                    ]),
               )
             ],
           ),

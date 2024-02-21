@@ -115,9 +115,9 @@ class _CallScreenState extends State<CallScreen> {
     log("late In CallScreen   : ${widget.lat}");
     log("long in CallScreen   : ${widget.long}");
     log("User_id in CallScreen   : ${widget.user_id}");
-    notificationService.requestNotificationPermission();
-    notificationService.firebaseInit(context);
-    notificationService.setupInteractMessage(context);
+    // notificationService.requestNotificationPermission();
+    // notificationService.firebaseInit(context);
+    // notificationService.setupInteractMessage(context);
     _controller = CarouselController();
     if (widget.user_id == null || widget.user_id.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {

@@ -52,7 +52,6 @@ dependencies:
   animate_do:
   flutter_spinkit: ^5.2.0
   flutter_local_notifications:
-  font_awesome_flutter:
   glassmorphism: ^3.0.0
 
 dev_dependencies:

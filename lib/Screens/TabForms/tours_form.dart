@@ -20,8 +20,11 @@ import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
 
 class ToursFormScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  ToursFormScreen({super.key, this.userId, required this.getContactId});
+
+  ToursFormScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<ToursFormScreen> createState() => _ToursFormScreenState();
@@ -204,7 +207,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   @override
   Widget build(BuildContext context) {
     log("user_id in Tour Screen:${widget.userId}");
-    log("getContactId in Tour Screen:${widget.getContactId}");
+
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -271,6 +274,9 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateDurationTour(value);
                     },
+                    onChanged: (value) {
+                      durationTourFieldKey.currentState!.validate();
+                    },
                     hintText: "Enter Days Of Tour",
                     fieldValidationkey: durationTourFieldKey),
                 const SizedBox(
@@ -323,12 +329,9 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                   builder: (context, value, child) => CustomTextField(
                       boderColor: value.startDateFieldColor,
                       onTap: () {
-                        startDateFocusNode.attach(context);
                         value.setStartDateFieldColor(const Color(0xff0092ff));
                         value.setEndingDateFieldColor(Colors.black26);
-                        if (context != null) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        }
+
                         startDateMethod(context);
                       },
                       controller: startingDateController,
@@ -367,7 +370,6 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                     builder: (context, value, child) => CustomTextField(
                         boderColor: value.endingDateFieldColor,
                         onTap: () {
-                          endDateFocusNode.attach(context);
                           value
                               .setEndingDateFieldColor(const Color(0xff0092ff));
                           value.setStartDateFieldColor(Colors.black26);
@@ -378,9 +380,6 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                             errorModelClass.setErrorTourText("");
                           }
 
-                          if (context != null) {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          }
                           endingDateMethod(context);
                         },
                         controller: endingDateController,
@@ -419,7 +418,6 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
-                      peopleFocusNode.attach(context);
                       textFieldColorChangeViewModel
                           .setEndingDateFieldColor(Colors.black26);
                     },
@@ -434,6 +432,9 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                       return FieldValidator.validateNumberPeople(value);
                     },
                     hintText: "Enter Number Of Peolpe",
+                    onChanged: (value) {
+                      numberPeopleFieldKey.currentState!.validate();
+                    },
                     fieldValidationkey: numberPeopleFieldKey),
                 const SizedBox(
                   height: 6,
@@ -629,9 +630,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                               context: context,
                               firstname: firstname,
                               email: email1,
-                              contactid: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              contactid: getContact.toString(),
                               mobile: mobile,
                               typeTour: typeofTour,
                               startDate: statDate,
@@ -642,9 +641,7 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
                               numberPeople: numberofpeople,
                               destinationTour: destinationTour,
                               budgetTour: budget,
-                              userId: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              userId: getContact.toString(),
                               additionalInformation: additionalInformation);
 
                           // controler clear

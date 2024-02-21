@@ -20,8 +20,11 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class HotelFormScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  HotelFormScreen({super.key, this.userId, required this.getContactId});
+
+  HotelFormScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<HotelFormScreen> createState() => _HotelFormScreenState();
@@ -218,7 +221,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log("getContactId in Hotel Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -287,7 +289,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.checkOutFieldColor,
                                 onTap: () {
-                                  checkInDate.attach(context);
                                   value.setCheckInFieldColor(Colors.black26);
 
                                   value.setCheckOUtFieldColor(
@@ -351,7 +352,6 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                       Expanded(
                         child: CustomTextField(
                             onTap: () {
-                              state.attach(context);
                               textFieldColorChangeViewModel
                                   .setCheckOUtFieldColor(Colors.black26);
                             },
@@ -781,9 +781,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               context: context,
                               firstname: firstname,
                               email: email1,
-                              contactid: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              contactid: getContact.toString(),
                               mobile: mobile,
                               hostalName: hostalName,
                               checkInDate: checkInDate,
@@ -796,9 +794,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                               kids: kids,
                               meal: meal,
                               budget: budget,
-                              userId: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              userId: getContact.toString(),
                               numberroom: numberroom,
                               roomperfance: roomperfance,
                               additionalInformation: additionalInformation);

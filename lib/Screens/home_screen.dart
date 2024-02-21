@@ -142,13 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
-      const CircularProgressIndicator(
-        strokeWidth: 5,
-        color: Colors.black,
-      );
-    });
-
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {
         fetch();
@@ -173,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
         log("get ConntactId from create method in Home Screen:$getContactCreatId");
       }).whenComplete(() async {
         await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
+            ? getContact.toString()
             : getContactCreatId!.toString());
       });
     } else {
@@ -200,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
         log("Get ContactId from create method in Home Screen:$getContactCreatId");
       }).whenComplete(() async {
         await contactIdSaver(getContactCreatId == null
-            ? getContact!.toString()
+            ? getContact.toString()
             : getContactCreatId!.toString());
       });
     }
@@ -390,17 +383,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: height * .08,
                     width: width * .80,
                     press: () {
-                      Navigator.pushAndRemoveUntil(
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return WillPopScope(
+                            onWillPop: () async => false,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                      );
+
+                      Future.delayed(const Duration(seconds: 5), () {
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CheckConnectivityTabsScreen(
                               userId: widget.userId,
-                              getContactId: getContactCreatId == null
-                                  ? getContact!
-                                  : getContactCreatId!,
                             ),
                           ),
-                          (route) => false);
+                          (route) => false,
+                        );
+                      });
                     },
                     title: "Reservation Request"),
               ),
@@ -414,16 +420,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: height * .08,
                     width: width * .80,
                     press: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SpecialRequestScreen(
-                                    userId: widget.userId,
-                                    getContactId: getContactCreatId == null
-                                        ? getContact!
-                                        : getContactCreatId!,
-                                  )),
-                          (route) => false);
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return WillPopScope(
+                            onWillPop: () async => false, // Disable back button
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                      );
+                      Future.delayed(const Duration(seconds: 5), () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SpecialRequestScreen(
+                                      userId: widget.userId,
+                                    )),
+                            (route) => false);
+                      });
                     },
                     title: "Special Request"),
               ),

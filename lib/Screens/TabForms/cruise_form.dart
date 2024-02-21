@@ -21,8 +21,11 @@ import 'package:vacation_ownership_advisor/view_model/drop_down_view_model.dart'
 
 class CruiseFormScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  CruiseFormScreen({super.key, this.userId, required this.getContactId});
+
+  CruiseFormScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<CruiseFormScreen> createState() => _CruiseFormScreenState();
@@ -238,7 +241,6 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log("getContactId in Cruise Screen:${widget.getContactId}");
     var size = MediaQuery.sizeOf(context);
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
@@ -373,12 +375,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                   builder: (context, value, child) => CustomTextField(
                       boderColor: value.sailingDateFieldColor,
                       onTap: () {
-                        sailingDateFocusNode.attach(context);
                         value.setSailingDateFieldColor(const Color(0xff0092ff));
                         value.setReturnDateFieldColor(Colors.black26);
-                        if (context != null) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        }
+
                         sailingDateMethod(context);
                       },
                       controller: saillingDateController,
@@ -417,7 +416,6 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     builder: (context, value, child) => CustomTextField(
                         boderColor: value.returnDateFieldColor,
                         onTap: () {
-                          returnDateFocusNode.attach(context);
                           value.setSailingDateFieldColor(Colors.black26);
                           value
                               .setReturnDateFieldColor(const Color(0xff0092ff));
@@ -428,9 +426,6 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                             errorModelClass.setErrorCruiseText("");
                           }
 
-                          if (context != null) {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          }
                           returnDateMethod(context);
                         },
                         controller: returnDateController,
@@ -483,6 +478,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     },
                     hintText: "Enter Number Of Nights",
                     focusNode: lenthFocusNode,
+                    onChanged: (value) {
+                      lenthOfCruiseFieldKey.currentState!.validate();
+                    },
                     fieldValidationkey: lenthOfCruiseFieldKey),
                 const SizedBox(
                   height: 6,
@@ -643,6 +641,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateCabinNumber(value);
                     },
+                    onChanged: (value) {
+                      numberOfCabinFieldKey.currentState!.validate();
+                    },
                     hintText: "Enter Number Cabin",
                     fieldValidationkey: numberOfCabinFieldKey),
                 const SizedBox(
@@ -728,6 +729,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                       return FieldValidator.validatePassangerNumber(value);
                     },
                     hintText: "Enter Number Of Passangers",
+                    onChanged: (value) {
+                      numberOfPassangersFieldKey.currentState!.validate();
+                    },
                     fieldValidationkey: numberOfPassangersFieldKey),
                 const SizedBox(
                   height: 6,
@@ -755,6 +759,9 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                       return FieldValidator.validatePassangerAge(value);
                     },
                     hintText: "Enter Passanger's Age",
+                    onChanged: (value) {
+                      passangerAgeFieldKey.currentState!.validate();
+                    },
                     fieldValidationkey: passangerAgeFieldKey),
                 const SizedBox(
                   height: 6,
@@ -869,12 +876,8 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                           await tabsViewModel.cruiseMethod(
                               context: context,
                               id: widget.userId.toString(),
-                              userId: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
-                              contactid: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              userId: getContact.toString(),
+                              contactid: getContact.toString(),
                               firstname: firstname,
                               email: email1,
                               mobile: mobile,

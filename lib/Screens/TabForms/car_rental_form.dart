@@ -20,8 +20,11 @@ import 'package:vacation_ownership_advisor/view_model/textformfield_change_color
 
 class CarRentalFormScreen extends StatefulWidget {
   dynamic userId;
-  String getContactId;
-  CarRentalFormScreen({super.key, this.userId, required this.getContactId});
+
+  CarRentalFormScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<CarRentalFormScreen> createState() => _CarRentalFormScreenState();
@@ -247,7 +250,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
-    log("getContactId in Car Rental Screen:  ${widget.getContactId}");
+
     TabsViewModel tabsViewModel = Provider.of<TabsViewModel>(context);
     ErrorModelClass errorModelClass =
         Provider.of<ErrorModelClass>(context, listen: false);
@@ -296,7 +299,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.pickDateFieldColor,
                               onTap: () {
-                                pickUpDate.attach(context);
                                 value.setPickTimeFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setDropTimeFieldColor(Colors.black26);
@@ -379,7 +381,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
-                      dropLocation.attach(context);
                       textFieldColorChangeViewModel
                           .setPickTimeFieldColor(Colors.black26);
                       textFieldColorChangeViewModel
@@ -410,7 +411,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                             child: CustomTextField(
                                 boderColor: value.dropDateColor,
                                 onTap: () {
-                                  dropOffDate.attach(context);
                                   value.setPickTimeFieldColor(Colors.black26);
                                   value.setPickDateFieldColor(Colors.black26);
                                   value.setDropTimeFieldColor(Colors.black26);
@@ -455,7 +455,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.dropTimeFieldColor,
                               onTap: () {
-                                dropOffTime.attach(context);
                                 value.setPickTimeFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setPickDateFieldColor(Colors.black26);
@@ -503,7 +502,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                 ),
                 CustomTextField(
                     onTap: () {
-                      typeCar.attach(context);
                       textFieldColorChangeViewModel
                           .setDropTimeFieldColor(Colors.black26);
                       textFieldColorChangeViewModel
@@ -647,9 +645,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           await tabsViewModel.carRentalMethod(
                               id: widget.userId.toString(),
                               context: context,
-                              contactid: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              contactid: getContact.toString(),
                               firstname: firstname,
                               email: email1,
                               mobile: mobile,
@@ -661,9 +657,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                               preferredCompany: preferedCompany,
                               pickUpLocation: pickLocation,
                               dropOffLocation: dropLocation,
-                              userId: widget.getContactId == null
-                                  ? getContact.toString()
-                                  : widget.getContactId.toString(),
+                              userId: getContact.toString(),
                               additionalInformation: additionalInformation);
                           //  clear fields
                           dropLocationController.clear();
