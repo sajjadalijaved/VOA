@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart';
@@ -141,6 +142,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    Timer(const Duration(seconds: 2), () {
+      const CircularProgressIndicator(
+        strokeWidth: 5,
+      );
+    });
 
     if (widget.userId == null || widget.userId.isEmpty) {
       splashServices.updateDataToDataBase(context).whenComplete(() {

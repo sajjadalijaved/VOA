@@ -6,6 +6,7 @@ import '../../Widgets/connectivity_check.dart';
 import '../../Widgets/glassmorplic_container.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:vacation_ownership_advisor/Screens/home_screen.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -43,9 +44,26 @@ class _MapScreenState extends State<MapScreen> {
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    CheckConnectivityHomeScreen(userId: widget.user_id),
+              ),
+              (route) => false);
+          return false;
+        }
       }
       if (permission == LocationPermission.deniedForever) {
-        permission = await Geolocator.requestPermission();
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  CheckConnectivityHomeScreen(userId: widget.user_id),
+            ),
+            (route) => false);
+        return false;
       }
 
       return true;
@@ -54,11 +72,24 @@ class _MapScreenState extends State<MapScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  CheckConnectivityHomeScreen(userId: widget.user_id),
+            ),
+            (route) => false);
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                CheckConnectivityHomeScreen(userId: widget.user_id),
+          ),
+          (route) => false);
 
       return false;
     }
