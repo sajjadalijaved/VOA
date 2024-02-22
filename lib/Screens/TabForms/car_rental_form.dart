@@ -304,10 +304,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                 value.setDropTimeFieldColor(Colors.black26);
                                 value.setPickDateFieldColor(
                                     const Color(0xff0092ff));
-                                if (context != null) {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                }
+
                                 pickUpDateMethod(context);
                               },
                               paddingLeft: size.width * 0.05,
@@ -333,16 +330,12 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                           child: CustomTextField(
                               boderColor: value.pickTimeFieldColor,
                               onTap: () {
-                                pickUpTime.attach(context);
                                 value.setPickDateFieldColor(Colors.black26);
                                 value.setDropDateFieldColor(Colors.black26);
                                 value.setDropTimeFieldColor(Colors.black26);
                                 value.setPickTimeFieldColor(
                                     const Color(0xff0092ff));
-                                if (context != null) {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                }
+
                                 pickTimeMethod(context);
                               },
                               readonly: true,
@@ -423,10 +416,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                     errorModelClass.setErrorCarText("");
                                   }
 
-                                  if (context != null) {
-                                    FocusScope.of(context)
-                                        .requestFocus(FocusNode());
-                                  }
                                   dropDateMethod(context);
                                 },
                                 paddingRight: size.width * 0.01,

@@ -20,6 +20,7 @@ import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Screens/CallScreens/mapscreen.dart';
 import 'package:vacation_ownership_advisor/Screens/special_request_screen.dart';
 import 'package:vacation_ownership_advisor/Screens/TabForms/tabs_main_screen.dart';
+// ignore_for_file: use_build_context_synchronously
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -76,9 +77,11 @@ class _HomeScreenState extends State<HomeScreen> {
   TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
 
-  Future<void> clearContactId() async {
+  Future<bool> clearContactId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('contactId');
+
+    bool result = await prefs.remove('contactId');
+    return result;
   }
 
   // fetch data from database
@@ -111,17 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
         "Authorization": "Zoho-oauthtoken $token",
         "orgId": "753177605"
       };
-
       var response = await get(
           Uri.parse(
               "https://desk.zoho.com/api/v1/contacts/search?email=$email"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-
         log("Get ContactId Data : $data");
         getContact = data['data'][0]['id'];
-
         log("ContactId  : $getContact");
       } else {
         log("response statusCode :${response.statusCode}");
@@ -267,9 +267,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             textColor: Colors.white,
                             color: const Color(0xFF0092ff),
                             child: const Text('Yes'),
-                            onPressed: () {
+                            onPressed: () async {
+                              await clearContactId();
+
                               setState(() {
-                                clearContactId();
                                 userPraferance.remove().then((value) {
                                   Navigator.pushNamedAndRemoveUntil(
                                       context,

@@ -12,6 +12,7 @@ import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../view_model/textformfield_change_color_view_model.dart';
+// ignore_for_file: unnecessary_null_comparison
 
 class CheckConnectivityLogin extends StatelessWidget {
   const CheckConnectivityLogin({Key? key}) : super(key: key);
