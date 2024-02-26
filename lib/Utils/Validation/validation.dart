@@ -319,6 +319,11 @@ class FieldValidator {
     if (value.isEmpty) return "Phone number is required";
 
     String sanitizedValue = value.replaceAll(RegExp(r'[^\d+]'), '');
+    bool startsWithPlus = sanitizedValue.startsWith('+');
+    if (!startsWithPlus) {
+      return "Please include country code";
+    }
+    sanitizedValue = sanitizedValue.substring(1);
 
     Pattern pattern = r'^\+?\d{1,3}\d{6,14}$';
     RegExp regex = RegExp(pattern.toString());
