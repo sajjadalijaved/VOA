@@ -3,14 +3,13 @@ import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../modals/contact_id_model.dart';
 import '../../database/datamodel_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/modals/data_model.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
 import 'package:vacation_ownership_advisor/view_model/tabs_view_model.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/view_model/services/splash_services.dart';
 import 'package:vacation_ownership_advisor/view_model/error_controll_view_model.dart';
 import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
@@ -34,15 +33,17 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  late String getContact;
+  String? getContact;
+  String? contactUserIdFetch;
+
+  List<DataModel>? models;
+  List<ContactIdModel>? contactDataModels;
+  DataModelProvider dataModelProvider = DataModelProvider();
+  DataModel? latestData;
+  ContactIdModel? latestContactIdData;
 
   DateTime? _checkInDate;
   DateTime? _checkOutDate;
-
-  List<DataModel>? models;
-  DataModelProvider dataModelProvider = DataModelProvider();
-  SplashServices splashServices = SplashServices();
-  DataModel? latestData;
 
   late TextEditingController checkInDateController;
   late TextEditingController checkOutController;
@@ -148,32 +149,41 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
     }
   }
 
-  // contactId get through sharePreferences
-  Future<String> contactIdRetriever() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String id = prefs.getString('contactId') ?? '';
-    return id;
+  // fetch Contactid from database
+  Future fetchContactId() async {
+    var contactDataModels = await dataModelProvider.fetchContactIdMethod();
+    if (contactDataModels != null) {
+      setState(() {
+        this.contactDataModels = contactDataModels;
+        latestContactIdData =
+            contactDataModels.isNotEmpty ? contactDataModels.last : null;
+
+        if (latestContactIdData != null) {
+          getContact = latestContactIdData!.contactId.toString();
+          log("contactIdFetch in hotel : $getContact");
+          contactUserIdFetch = latestContactIdData!.contact_user_Id.toString();
+          log("contactUserIdFetch : $contactUserIdFetch");
+        } else {
+          getContact = " ";
+          contactUserIdFetch = " ";
+
+          log("latestContactIdData is null. Setting default values for contactIdFetch and contactUserIdFetch.");
+        }
+      });
+    } else {
+      setState(() {
+        this.contactDataModels = [];
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.userId == null || widget.userId.isEmpty) {
-      splashServices.updateDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getContact = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method Hotel Screen: $getContact");
-      });
-    } else {
-      splashServices.sendUserDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getContact = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method Hotel Screen: $getContact");
-      });
-    }
+    fetch().whenComplete(() async {
+      await fetchContactId();
+    });
 
     checkInDateController = TextEditingController();
     checkOutController = TextEditingController();

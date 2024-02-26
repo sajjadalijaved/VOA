@@ -3,15 +3,14 @@ import '../modals/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import '../modals/contact_id_model.dart';
 import 'package:animate_do/animate_do.dart';
 import '../view_model/tabs_view_model.dart';
 import '../database/datamodel_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/Utils/utils.dart';
 import 'package:vacation_ownership_advisor/Screens/home_screen.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Utils/Validation/validation.dart';
-import 'package:vacation_ownership_advisor/view_model/services/splash_services.dart';
 
 // ignore_for_file: must_be_immutable
 
@@ -33,24 +32,18 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  late String getIdFromSaveMethod;
+  String? getContact;
+  String? contactUserIdFetch;
 
   List<DataModel>? models;
+  List<ContactIdModel>? contactDataModels;
   DataModelProvider dataModelProvider = DataModelProvider();
-  SplashServices splashServices = SplashServices();
-
   DataModel? latestData;
-  late TextEditingController specialFieldController;
+  ContactIdModel? latestContactIdData;
 
+  late TextEditingController specialFieldController;
   final GlobalKey<FormState> key = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> specialFieldKey = GlobalKey<FormFieldState>();
-
-  // contactId get through sharePreferences
-  Future<String> contactIdRetriever() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String id = prefs.getString('contactId') ?? '';
-    return id;
-  }
 
   // fetch data from database
   Future fetch() async {
@@ -77,26 +70,42 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
     }
   }
 
+  // fetch Contactid from database
+  Future fetchContactId() async {
+    var contactDataModels = await dataModelProvider.fetchContactIdMethod();
+    if (contactDataModels != null) {
+      setState(() {
+        this.contactDataModels = contactDataModels;
+        latestContactIdData =
+            contactDataModels.isNotEmpty ? contactDataModels.last : null;
+
+        if (latestContactIdData != null) {
+          getContact = latestContactIdData!.contactId.toString();
+          log("contactIdFetch in special : $getContact");
+          contactUserIdFetch = latestContactIdData!.contact_user_Id.toString();
+          log("contactUserIdFetch : $contactUserIdFetch");
+        } else {
+          getContact = " ";
+          contactUserIdFetch = " ";
+
+          log("latestContactIdData is null. Setting default values for contactIdFetch and contactUserIdFetch.");
+        }
+      });
+    } else {
+      setState(() {
+        this.contactDataModels = [];
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     specialFieldController = TextEditingController();
 
-    if (widget.userId == null || widget.userId.isEmpty) {
-      splashServices.updateDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getIdFromSaveMethod = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method: $getIdFromSaveMethod");
-      });
-    } else {
-      splashServices.sendUserDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getIdFromSaveMethod = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method: $getIdFromSaveMethod");
-      });
-    }
+    fetch().whenComplete(() async {
+      await fetchContactId();
+    });
   }
 
   @override
@@ -236,8 +245,8 @@ class _SpecialRequestScreenState extends State<SpecialRequestScreen> {
                               email: email1,
                               id: widget.userId.toString(),
                               mobile: mobile,
-                              contactid: getIdFromSaveMethod,
-                              userId: getIdFromSaveMethod,
+                              contactid: getContact.toString(),
+                              userId: getContact.toString(),
                               specialRequestData: specialRequest);
                           specialFieldController.clear();
                         } else {

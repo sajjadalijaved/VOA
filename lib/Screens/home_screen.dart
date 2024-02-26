@@ -15,8 +15,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../repository/tab_bar_screens_auth.dart';
 import '../view_model/services/splash_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
+import 'package:vacation_ownership_advisor/modals/contact_id_model.dart';
 import 'package:vacation_ownership_advisor/Screens/CallScreens/mapscreen.dart';
 import 'package:vacation_ownership_advisor/Screens/special_request_screen.dart';
 import 'package:vacation_ownership_advisor/Screens/TabForms/tabs_main_screen.dart';
@@ -70,19 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
   String? email;
   String? getContact;
   String? getContactCreatId;
+  String? contactIdFetch;
+  String? contactUserIdFetch;
 
   List<DataModel>? models;
+  List<ContactIdModel>? contactDataModels;
   DataModelProvider dataModelProvider = DataModelProvider();
   SplashServices splashServices = SplashServices();
   TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
-
-  Future<bool> clearContactId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    bool result = await prefs.remove('contactId');
-    return result;
-  }
+  ContactIdModel? latestContactIdData;
 
   // fetch data from database
   Future fetch() async {
@@ -108,7 +105,35 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future getContactIdMethod({required String email}) async {
+// fetch Contactid from database
+  Future fetchContactId() async {
+    var contactDataModels = await dataModelProvider.fetchContactIdMethod();
+    if (contactDataModels != null) {
+      setState(() {
+        this.contactDataModels = contactDataModels;
+        latestContactIdData =
+            contactDataModels.isNotEmpty ? contactDataModels.last : null;
+
+        if (latestContactIdData != null) {
+          contactIdFetch = latestContactIdData!.contactId.toString();
+          log("contactIdFetch : $contactIdFetch");
+          contactUserIdFetch = latestContactIdData!.contact_user_Id.toString();
+          log("contactUserIdFetch : $contactUserIdFetch");
+        } else {
+          contactIdFetch = " ";
+          contactUserIdFetch = " ";
+
+          log("latestContactIdData is null. $contactIdFetch values for contactIdFetch and $contactUserIdFetch contactUserIdFetch.");
+        }
+      });
+    } else {
+      setState(() {
+        this.contactDataModels = [];
+      });
+    }
+  }
+
+  Future<String?> getContactIdMethod({required String email}) async {
     try {
       Map<String, String> headers = {
         "Authorization": "Zoho-oauthtoken $token",
@@ -121,82 +146,65 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         log("Get ContactId Data : $data");
-        getContact = data['data'][0]['id'];
-        log("ContactId  : $getContact");
+        String? id1 = data['data'][0]['id'];
+        log("ContactId  : $id1");
+        return id1;
       } else {
-        log("response statusCode :${response.statusCode}");
+        log("No Content Fond for this email :${response.statusCode}");
+        return null;
       }
     } catch (e) {
       log("err0r : $e");
+      return null;
     }
   }
 
-  // save contactId
-  Future<String> contactIdSaver(String id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('contactId', id);
-
-    return 'saved';
+  Future<void> fetchMethods() async {
+    try {
+      await splashServices.sendUserDataToDataBase(context);
+      await fetch();
+      await tabsScreenAuth.tabsScreensAccessToken();
+      final contactId = await getContactIdMethod(email: email!);
+      await fetchContactId();
+      if (contactId == null && latestContactIdData == null) {
+        await tabsScreenAuth.contactCreateMethod(
+          email: email.toString(),
+          firstname: firstName.toString(),
+          mobile: phoneNumber.toString(),
+        );
+        log("New Record Added");
+      } else {
+        log("Record already exists");
+      }
+      final contactCreateId = tabsScreenAuth.getContactCreateIdMethod();
+      log("Get ContactId from create method in Home Screen: $contactCreateId");
+      if (latestContactIdData == null) {
+        await dataModelProvider.insertContactId(
+          ContactIdModel(
+            contactId: contactCreateId ?? contactId!,
+            contact_user_Id: widget.userId.toString(),
+          ),
+        );
+      } else if (contactId != null) {
+        await dataModelProvider.updateContactId(
+          ContactIdModel(
+            contactId: contactId,
+            contact_user_Id: widget.userId.toString(),
+          ),
+        );
+      } else {
+        log("Contact Id already saved: $contactIdFetch");
+      }
+    } catch (e) {
+      log("Error during data fetching: $e");
+      // Handle errors appropriately
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.userId == null || widget.userId.isEmpty) {
-      splashServices.updateDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("get ConntactId from create method in Home Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact.toString()
-            : getContactCreatId!.toString());
-      });
-    } else {
-      splashServices.sendUserDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        // accessToken method call
-        await tabsScreenAuth.tabsScreensAccessToken();
-      }).whenComplete(() async {
-        await getContactIdMethod(email: email!);
-      }).whenComplete(() async {
-        if (getContact == null) {
-          await tabsScreenAuth.contactCreateMethod(
-            email: email.toString(),
-            firstname: firstName.toString(),
-            mobile: phoneNumber.toString(),
-          );
-          log("New Recorde Add:");
-        } else {
-          log("Recorde already exists:");
-        }
-      }).whenComplete(() {
-        getContactCreatId = tabsScreenAuth.getContactCreateIdMethod();
-        log("Get ContactId from create method in Home Screen:$getContactCreatId");
-      }).whenComplete(() async {
-        await contactIdSaver(getContactCreatId == null
-            ? getContact.toString()
-            : getContactCreatId!.toString());
-      });
-    }
+    fetchMethods();
   }
 
   @override
@@ -268,8 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: const Color(0xFF0092ff),
                             child: const Text('Yes'),
                             onPressed: () async {
-                              await clearContactId();
-
+                              await dataModelProvider.daleteContactId();
                               setState(() {
                                 userPraferance.remove().then((value) {
                                   Navigator.pushNamedAndRemoveUntil(
@@ -397,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
 
-                      Future.delayed(const Duration(seconds: 5), () {
+                      Future.delayed(const Duration(seconds: 3), () {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
@@ -433,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       );
-                      Future.delayed(const Duration(seconds: 5), () {
+                      Future.delayed(const Duration(seconds: 3), () {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(

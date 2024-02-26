@@ -3,9 +3,8 @@ import '../../Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../modals/contact_id_model.dart';
 import '../../database/datamodel_provider.dart';
-import '../../view_model/services/splash_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_ownership_advisor/modals/data_model.dart';
 import 'package:vacation_ownership_advisor/Widgets/custombutton.dart';
 import 'package:vacation_ownership_advisor/Widgets/customtextfield.dart';
@@ -34,18 +33,19 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
   String? firstName;
   String? phoneNumber;
   String? email;
-  late String getContact;
-
-  DateTime? _pickDate;
-  DateTime? _dropDate;
+  String? getContact;
+  String? contactUserIdFetch;
 
   List<DataModel>? models;
+  List<ContactIdModel>? contactDataModels;
   DataModelProvider dataModelProvider = DataModelProvider();
-  SplashServices splashServices = SplashServices();
   DataModel? latestData;
+  ContactIdModel? latestContactIdData;
 
   TimeOfDay? pickTime;
   TimeOfDay? dropTime;
+  DateTime? _pickDate;
+  DateTime? _dropDate;
 
   late TextEditingController pickLocationController;
   late TextEditingController pickDateController;
@@ -84,14 +84,6 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
       GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropTimeFieldKey =
       GlobalKey<FormFieldState>();
-
-// contactId get through sharePreferences
-  Future<String> contactIdRetriever() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String id = prefs.getString('contactId') ?? '';
-
-    return id;
-  }
 
   // fetch data from database
   Future fetch() async {
@@ -186,6 +178,34 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     }
   }
 
+  // fetch Contactid from database
+  Future fetchContactId() async {
+    var contactDataModels = await dataModelProvider.fetchContactIdMethod();
+    if (contactDataModels != null) {
+      setState(() {
+        this.contactDataModels = contactDataModels;
+        latestContactIdData =
+            contactDataModels.isNotEmpty ? contactDataModels.last : null;
+
+        if (latestContactIdData != null) {
+          getContact = latestContactIdData!.contactId.toString();
+          log("contactIdFetch in car : $getContact");
+          contactUserIdFetch = latestContactIdData!.contact_user_Id.toString();
+          log("contactUserIdFetch : $contactUserIdFetch");
+        } else {
+          getContact = " ";
+          contactUserIdFetch = " ";
+
+          log("latestContactIdData is null. Setting default values for contactIdFetch and contactUserIdFetch.");
+        }
+      });
+    } else {
+      setState(() {
+        this.contactDataModels = [];
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -208,21 +228,9 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
     dropLocation = FocusNode();
     typeCar = FocusNode();
 
-    if (widget.userId == null || widget.userId.isEmpty) {
-      splashServices.updateDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getContact = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method Car Rental Screen: $getContact");
-      });
-    } else {
-      splashServices.sendUserDataToDataBase(context).whenComplete(() {
-        fetch();
-      }).whenComplete(() async {
-        getContact = await contactIdRetriever();
-        log("Get Contact Id From ContactRetriver Method Car Rental Screen: $getContact");
-      });
-    }
+    fetch().whenComplete(() async {
+      await fetchContactId();
+    });
   }
 
   @override
