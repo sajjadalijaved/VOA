@@ -105,68 +105,6 @@ class _TabsMainScreenState extends State<TabsMainScreen>
             style: TextStyle(
                 color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           ),
-
-          // bottom: PreferredSize(
-          //   preferredSize: const Size.fromHeight(70),
-          //   child: Flexible(
-          //     child: TabBar(
-          //         indicatorSize: TabBarIndicatorSize.label,
-          //         //isScrollable: true,
-          //         unselectedLabelColor: Colors.grey.shade600,
-          //         physics: const BouncingScrollPhysics(),
-          //         controller: _tabController,
-          //         tabAlignment: TabAlignment.fill,
-          //         dividerColor: Colors.grey.shade500,
-          //         tabs: const [
-          //           FittedBox(
-          //             fit: BoxFit.contain,
-          //             child: Tab(
-          //               icon: Icon(
-          //                 Icons.hotel,
-          //               ),
-          //               text: "Hotel",
-          //             ),
-          //           ),
-          //           FittedBox(
-          //             fit: BoxFit.contain,
-          //             child: Tab(
-          //               icon: Icon(
-          //                 Icons.car_rental_sharp,
-          //               ),
-          //               text: "Car Rental",
-          //             ),
-          //           ),
-          //           FittedBox(
-          //             fit: BoxFit.contain,
-          //             child: Tab(
-          //               icon: Icon(
-          //                 FontAwesomeIcons.plane,
-          //                 size: 20,
-          //               ),
-          //               text: "Flights",
-          //             ),
-          //           ),
-          //           FittedBox(
-          //             fit: BoxFit.contain,
-          //             child: Tab(
-          //               icon: Icon(
-          //                 Icons.wallet_travel,
-          //               ),
-          //               text: "Cruise",
-          //             ),
-          //           ),
-          //           FittedBox(
-          //             fit: BoxFit.contain,
-          //             child: Tab(
-          //               icon: Icon(
-          //                 Icons.tour,
-          //               ),
-          //               text: "Tour",
-          //             ),
-          //           ),
-          //         ]),
-          //   ),
-          // ),
         ),
         body: SizedBox(
           width: size.width,

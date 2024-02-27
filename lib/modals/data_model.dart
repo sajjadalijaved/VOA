@@ -5,7 +5,6 @@ class DataModel {
   String? firstName;
   String? email;
   String? phoneNumber;
-  String? contactId;
 
   static const String dbName = "dataModel.db";
   static const String tableName = "dataModel_tb";
@@ -16,7 +15,7 @@ class DataModel {
   static const String key_email = 'email';
 
   static const String create_table =
-      'CREATE TABLE  $tableName($key_userId TEXT PRIMARY KEY, $key_phoneNumber TEXT, $key_firstName TEXT, $key_email TEXT,)';
+      'CREATE TABLE  $tableName($key_userId TEXT PRIMARY KEY, $key_phoneNumber TEXT, $key_firstName TEXT, $key_email TEXT)';
   static const String drop_table = 'DROP TABLE IF EXISTS $tableName';
   static const String fetch_data = 'SELECT *FROM $tableName';
 

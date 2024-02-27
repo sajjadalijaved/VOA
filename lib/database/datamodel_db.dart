@@ -11,21 +11,21 @@ class DataModelDbHelper {
   static Database? _database;
 
   static Future<Database> getDb() async {
-    if (_database == null) {
-      _database =
-          await openDatabase(join(await getDatabasesPath(), DataModel.dbName),
-              onCreate: (db, version) {
+    _database ??= await openDatabase(
+      join(await getDatabasesPath(), DataModel.dbName),
+      onCreate: (db, version) {
         db.execute(DataModel.create_table);
         log('******************OnCreate^^^^^^^^^^^^^^^^^^^^^^^^^ ');
-      }, onUpgrade: (db, oldVersion, newVersion) {
+      },
+      onUpgrade: (db, oldVersion, newVersion) {
         if (oldVersion != newVersion) {
           db.execute(DataModel.drop_table);
           db.execute(DataModel.create_table);
         }
-      }, version: 1);
-      return Future.value(_database);
-    }
-    return Future.value(_database);
+      },
+      version: 1,
+    );
+    return _database!;
   }
 
   static Future<Database> getDbContact() async {

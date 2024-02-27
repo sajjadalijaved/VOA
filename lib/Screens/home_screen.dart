@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
           contactIdFetch = " ";
           contactUserIdFetch = " ";
 
-          log("latestContactIdData is null. $contactIdFetch values for contactIdFetch and $contactUserIdFetch contactUserIdFetch.");
+          log("latestContactIdData is null. Setting default values for contactIdFetch and  contactUserIdFetch.");
         }
       });
     } else {
@@ -370,6 +370,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: height * .08,
                     width: width * .80,
                     press: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return WillPopScope(
+                            onWillPop: () async => false,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                      );
+                      Future.delayed(const Duration(seconds: 5), () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                user_id: widget.userId,
+                              ),
+                            ),
+                            (route) => false);
+                      });
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
@@ -404,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
 
-                      Future.delayed(const Duration(seconds: 3), () {
+                      Future.delayed(const Duration(seconds: 5), () {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
@@ -440,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       );
-                      Future.delayed(const Duration(seconds: 3), () {
+                      Future.delayed(const Duration(seconds: 5), () {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
