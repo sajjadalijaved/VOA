@@ -69,7 +69,6 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         child: Form(
           key: _key,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 height: height * .10,
@@ -108,25 +107,12 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                 duration: const Duration(milliseconds: 1000),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: width * .05),
-                  child: const FittedBox(
-                    fit: BoxFit.contain,
-                    child: Text(
-                      "Pease enter the email address attached ",
-                      style: TextStyle(
-                          color: Colors.black38, fontSize: 17, height: 1),
-                    ),
-                  ),
-                ),
-              ),
-              FadeInUp(
-                delay: const Duration(milliseconds: 1600),
-                duration: const Duration(milliseconds: 1000),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * .10),
                   child: const Text(
-                    "to your Vacation Ownership Advisor user account.",
+                    "Please enter the email address attached to your Vacation Ownership Advisor user account.",
                     style: TextStyle(
-                        color: Colors.black38, fontSize: 17, height: 1),
+                      color: Colors.black38,
+                      fontSize: 17,
+                    ),
                   ),
                 ),
               ),
@@ -135,19 +121,21 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               ),
               Consumer<TextFieldColorChangeViewModel>(
                 builder: (context, value, child) => FadeInUp(
-                  delay: const Duration(milliseconds: 1800),
+                  delay: const Duration(milliseconds: 1600),
                   duration: const Duration(milliseconds: 1000),
                   child: CustomTextField(
                     onTap: () {
                       value.setEmailForgetFieldColor(const Color(0xff0092ff));
                     },
-                    hintText: "Email",
+                    hintText: "Enter email attach to your account",
                     prefixIcon: Icon(
                       Icons.email_outlined,
                       color: value.emailForgetFieldColor,
                     ),
                     controller: _emailController,
                     fieldValidationkey: _emailkey,
+                    inputAction: TextInputAction.done,
+                    textInputType: TextInputType.emailAddress,
                     validate: (value) {
                       return FieldValidator.validateEmail(value.toString());
                     },
@@ -164,7 +152,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.10),
                 child: FadeInUp(
-                  delay: const Duration(milliseconds: 2000),
+                  delay: const Duration(milliseconds: 1800),
                   duration: const Duration(milliseconds: 1000),
                   child: CustomButton(
                       loading: authViewModal.forgetPasswordloading,
@@ -189,7 +177,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                 height: height * .02,
               ),
               FadeInUp(
-                  delay: const Duration(milliseconds: 2300),
+                  delay: const Duration(milliseconds: 2000),
                   duration: const Duration(milliseconds: 1000),
                   child: const Divider()),
               FadeInUp(

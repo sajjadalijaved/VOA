@@ -23,6 +23,7 @@ class CustomTextField extends StatelessWidget {
       required this.controller,
       this.focusNode,
       this.onChanged,
+      this.label,
       this.errorText,
       this.obscureText = false,
       this.fieldValidationkey});
@@ -41,6 +42,7 @@ class CustomTextField extends StatelessWidget {
   double? paddingRight;
   Widget? prefixIcon;
   bool readonly;
+  String? label;
   String? errorText;
   FocusNode? focusNode;
   var validate;
@@ -73,6 +75,7 @@ class CustomTextField extends StatelessWidget {
         validator: validate,
         textInputAction: inputAction,
         decoration: InputDecoration(
+          labelText: label,
           errorText: errorText,
           hintText: hintText,
 

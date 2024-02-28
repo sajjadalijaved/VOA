@@ -1,4 +1,5 @@
 import '../../Utils/utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../view_model/textformfield_change_color_view_model.dart';
+
 // ignore_for_file: unnecessary_null_comparison
 
 class CheckConnectivityLogin extends StatelessWidget {
@@ -158,11 +160,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: emailController,
                       fieldValidationkey: emailFieldKey,
                       hintText: "User Email",
-                      textInputType: TextInputType.emailAddress,
-                      inputAction: TextInputAction.next,
                       onChanged: (value) {
                         emailFieldKey.currentState!.validate();
                       },
+                      textInputType: TextInputType.emailAddress,
+                      inputAction: TextInputAction.next,
                       boderColor: value.emailFieldColor,
                     ),
                   ),
@@ -184,9 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           value.setPasswordFieldColor(const Color(0xff0092ff));
                         },
                         character: '*',
-                        onChanged: (value) {
-                          passwordFieldKey.currentState!.validate();
-                        },
                         prefixIcon:
                             Icon(Icons.lock, color: value.passwordFieldColor),
                         controller: passwordController,

@@ -1,10 +1,13 @@
 import 'package:flutter/services.dart';
+// ignore_for_file: prefer_typing_uninitialized_variables
 
 class FieldValidator {
   static String? validateEmail(String value) {
     if (value.isEmpty) {
       return 'Email is Required';
     }
+    //
+
     if (!RegExp(r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$")
         .hasMatch(value)) {
       return 'Please enter a valid Email';
