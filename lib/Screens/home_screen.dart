@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<DataModel>? models;
   List<ContactIdModel>? contactDataModels;
   DataModelProvider dataModelProvider = DataModelProvider();
+
   SplashServices splashServices = SplashServices();
   TabsScreenAuth tabsScreenAuth = TabsScreenAuth();
   DataModel? latestData;
