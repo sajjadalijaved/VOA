@@ -5,9 +5,9 @@ import '../../modals/usermodel.dart';
 import '../../modals/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../../Utils/routes/routesname.dart';
 import '../../database/datamodel_provider.dart';
 import 'package:vacation_ownership_advisor/Screens/home_screen.dart';
+import 'package:vacation_ownership_advisor/Screens/AuthenticationScreens/login.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -19,16 +19,53 @@ class SplashServices {
       if (value.user_id.toString() == 'null' ||
           value.user_id.toString() == '') {
         await Future.delayed(const Duration(seconds: 3));
-        Navigator.pushNamedAndRemoveUntil(
-            context, RoutesName.checkConnectivityloginScreen, (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = const Offset(0.0, -1.0);
+                var end = Offset.zero;
+                var curve = Curves.easeIn;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(seconds: 1),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return const CheckConnectivityLogin();
+              },
+            ),
+            (route) => false);
       } else {
         await Future.delayed(const Duration(seconds: 3));
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(
-                builder: (context) => CheckConnectivityHomeScreen(
-                      userId: value.user_id.toString(),
-                    )),
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = const Offset(0.0, 1.0);
+                var end = Offset.zero;
+                var curve = Curves.easeIn;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(seconds: 1),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return CheckConnectivityHomeScreen(
+                  userId: value.user_id,
+                );
+              },
+            ),
             (route) => false);
       }
     }).onError((error, stackTrace) {

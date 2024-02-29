@@ -5,13 +5,14 @@ import 'package:provider/provider.dart';
 import '../../Widgets/custombutton.dart';
 import '../../view_model/view_modal.dart';
 import '../../bloc/connectivity_bloc.dart';
-import '../../Utils/routes/routesname.dart';
 import '../../Widgets/customtextfield.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../view_model/textformfield_change_color_view_model.dart';
+import 'package:vacation_ownership_advisor/Screens/AuthenticationScreens/signupscreen.dart';
+import 'package:vacation_ownership_advisor/Screens/AuthenticationScreens/forget_password.dart';
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -223,9 +224,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.only(left: width * .55),
                       child: InkWell(
                           onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
+                            Navigator.pushAndRemoveUntil(
                                 context,
-                                RoutesName.checkConnectivityForgetPassword,
+                                PageRouteBuilder(
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    var begin = const Offset(1.0, 0.0);
+                                    var end = Offset.zero;
+                                    var curve = Curves.easeIn;
+
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+                                    return SlideTransition(
+                                      position: animation.drive(tween),
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration:
+                                      const Duration(seconds: 1),
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return const CheckConnectivityForgetPassword();
+                                  },
+                                ),
                                 (route) => false);
                           },
                           child: const Text(
@@ -300,9 +321,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.bold),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.pushNamedAndRemoveUntil(
+                              Navigator.pushAndRemoveUntil(
                                   context,
-                                  RoutesName.checkConnectivitysignUpScreen,
+                                  PageRouteBuilder(
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var begin = const Offset(1.0, 0.0);
+                                      var end = Offset.zero;
+                                      var curve = Curves.easeIn;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return const CheckConnectivitySignUp();
+                                    },
+                                  ),
                                   (route) => false);
                             })
                     ])),

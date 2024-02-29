@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../bloc/connectivity_bloc.dart';
 import '../Utils/no_connection_page.dart';
+import 'AuthenticationScreens/login.dart';
 import 'package:animate_do/animate_do.dart';
-import '../../Utils/routes/routesname.dart';
 import '../database/datamodel_provider.dart';
 import '../../view_model/user_view_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +20,7 @@ import 'package:vacation_ownership_advisor/modals/contact_id_model.dart';
 import 'package:vacation_ownership_advisor/Screens/CallScreens/mapscreen.dart';
 import 'package:vacation_ownership_advisor/Screens/special_request_screen.dart';
 import 'package:vacation_ownership_advisor/Screens/TabForms/tabs_main_screen.dart';
+
 // ignore_for_file: use_build_context_synchronously
 
 // ignore_for_file: unnecessary_null_comparison
@@ -63,7 +64,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   dynamic currentBackPressTime;
   String? firstName;
   String? phoneNumber;
@@ -280,12 +282,34 @@ class _HomeScreenState extends State<HomeScreen> {
                               await dataModelProvider.daleteContactId();
                               setState(() {
                                 userPraferance.remove().then((value) {
-                                  Navigator.pushNamedAndRemoveUntil(
+                                  Navigator.pushAndRemoveUntil(
                                       context,
-                                      RoutesName.checkConnectivityloginScreen,
+                                      PageRouteBuilder(
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          var begin = const Offset(0.0, 1.0);
+                                          var end = Offset.zero;
+                                          var curve = Curves.easeIn;
+
+                                          var tween = Tween(
+                                                  begin: begin, end: end)
+                                              .chain(CurveTween(curve: curve));
+                                          return SlideTransition(
+                                            position: animation.drive(tween),
+                                            child: child,
+                                          );
+                                        },
+                                        transitionDuration:
+                                            const Duration(seconds: 1),
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return const CheckConnectivityLogin();
+                                        },
+                                      ),
                                       (route) => false);
                                 });
                               });
+
                               Navigator.of(context).pop();
                             },
                           ),
@@ -371,34 +395,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: height * .08,
                     width: width * .80,
                     press: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return WillPopScope(
-                            onWillPop: () async => false,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        },
-                      );
-                      Future.delayed(const Duration(seconds: 5), () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MapScreen(
-                                user_id: widget.userId,
-                              ),
-                            ),
-                            (route) => false);
-                      });
                       Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => MapScreen(
-                              user_id: widget.userId,
-                            ),
+                          PageRouteBuilder(
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = const Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.easeIn;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(seconds: 1),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return MapScreen(
+                                user_id: widget.userId,
+                              );
+                            },
                           ),
                           (route) => false);
                     },
@@ -427,16 +446,32 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
 
-                      Future.delayed(const Duration(seconds: 5), () {
+                      Future.delayed(const Duration(seconds: 4), () {
                         Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CheckConnectivityTabsScreen(
-                              userId: widget.userId,
+                            context,
+                            PageRouteBuilder(
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = const Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeIn;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                              transitionDuration: const Duration(seconds: 1),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return CheckConnectivityTabsScreen(
+                                  userId: widget.userId,
+                                );
+                              },
                             ),
-                          ),
-                          (route) => false,
-                        );
+                            (route) => false);
                       });
                     },
                     title: "Reservation Request"),
@@ -463,13 +498,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       );
-                      Future.delayed(const Duration(seconds: 5), () {
+                      Future.delayed(const Duration(seconds: 4), () {
                         Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => SpecialRequestScreen(
-                                      userId: widget.userId,
-                                    )),
+                            PageRouteBuilder(
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = const Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeIn;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                              transitionDuration: const Duration(seconds: 1),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return SpecialRequestScreen(
+                                  userId: widget.userId,
+                                );
+                              },
+                            ),
                             (route) => false);
                       });
                     },

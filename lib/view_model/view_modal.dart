@@ -3,8 +3,8 @@ import 'user_view_model.dart';
 import '../modals/usermodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../Utils/routes/routesname.dart';
 import '../repository/auth_repository.dart';
+import '../Screens/AuthenticationScreens/login.dart';
 import 'package:vacation_ownership_advisor/Screens/home_screen.dart';
 
 // ignore_for_file: non_constant_identifier_names
@@ -56,10 +56,27 @@ class AuthViewModal with ChangeNotifier {
       if (status == "success") {
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(
-                builder: (context) => CheckConnectivityHomeScreen(
-                      userId: user_id,
-                    )),
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = const Offset(0.0, 1.0);
+                var end = Offset.zero;
+                var curve = Curves.easeIn;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(seconds: 1),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return CheckConnectivityHomeScreen(
+                  userId: user_id,
+                );
+              },
+            ),
             (route) => false);
         Utils.successMessageFlush(msg.toString(), context);
       } else {
@@ -79,8 +96,28 @@ class AuthViewModal with ChangeNotifier {
       String message = value["message"].toString();
 
       if (message == "Registration successfully completed!") {
-        Navigator.pushNamedAndRemoveUntil(
-            context, RoutesName.checkConnectivityloginScreen, (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = const Offset(-1.0, 0.0);
+                var end = Offset.zero;
+                var curve = Curves.easeIn;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(seconds: 1),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return const CheckConnectivityLogin();
+              },
+            ),
+            (route) => false);
         Utils.successMessageFlush(message.toString(), context);
       } else {
         Utils.errorMessageFlush(message.toString(), context);
@@ -101,8 +138,28 @@ class AuthViewModal with ChangeNotifier {
       String message = value["message"].toString();
 
       if (status == "success") {
-        Navigator.pushNamedAndRemoveUntil(
-            context, RoutesName.checkConnectivityloginScreen, (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = const Offset(-1.0, 0.0);
+                var end = Offset.zero;
+                var curve = Curves.easeIn;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration: const Duration(seconds: 1),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return const CheckConnectivityLogin();
+              },
+            ),
+            (route) => false);
         Utils.successMessageFlush(
             'Password Successfully Send To Your Email '.toString(), context);
       } else {

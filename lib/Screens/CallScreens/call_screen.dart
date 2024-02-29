@@ -162,13 +162,30 @@ class _CallScreenState extends State<CallScreen> {
             child: const Icon(Icons.arrow_back,
                 size: 30, color: Color(0xFF0092ff)),
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        CheckConnectivityHomeScreen(userId: widget.user_id),
-                  ),
-                  (route) => false);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    var begin = const Offset(-1.0, 0.0);
+                    var end = Offset.zero;
+                    var curve = Curves.easeIn;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(seconds: 1),
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return CheckConnectivityHomeScreen(
+                      userId: widget.user_id,
+                    );
+                  },
+                ),
+              );
             }),
       ),
       body: SafeArea(

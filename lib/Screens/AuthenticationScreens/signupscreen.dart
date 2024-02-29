@@ -6,13 +6,13 @@ import 'package:provider/provider.dart';
 import '../../Widgets/custombutton.dart';
 import '../../view_model/view_modal.dart';
 import '../../bloc/connectivity_bloc.dart';
-import '../../Utils/routes/routesname.dart';
 import '../../Widgets/customtextfield.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../Utils/no_connection_page.dart';
 import '../../Utils/Validation/validation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vacation_ownership_advisor/Screens/AuthenticationScreens/login.dart';
 import 'package:vacation_ownership_advisor/view_model/textformfield_change_color_view_model.dart';
 
 // ignore_for_file: unused_local_variable
@@ -455,9 +455,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontWeight: FontWeight.w500),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.pushNamedAndRemoveUntil(
+                              Navigator.pushAndRemoveUntil(
                                   context,
-                                  RoutesName.checkConnectivityloginScreen,
+                                  PageRouteBuilder(
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var begin = const Offset(-1.0, 0.0);
+                                      var end = Offset.zero;
+                                      var curve = Curves.easeIn;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return const CheckConnectivityLogin();
+                                    },
+                                  ),
                                   (route) => false);
                             })
                     ])),
