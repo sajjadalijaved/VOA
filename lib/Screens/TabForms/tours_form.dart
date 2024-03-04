@@ -84,21 +84,25 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   // fetch data from database
   Future fetch() async {
     var models = await dataModelProvider.fetchData();
-    if (models != null) {
-      setState(() {
-        this.models = models;
-        latestData = models.isNotEmpty ? models.last : null;
-        firstName = latestData!.firstName.toString();
-        log("name : $firstName");
-        phoneNumber = latestData!.phoneNumber.toString();
-        log("phone : $phoneNumber");
-        email = latestData!.email.toString();
-        log("email : $email");
-      });
-    } else {
-      setState(() {
-        this.models = [];
-      });
+    if (mounted) {
+      if (models != null) {
+        setState(() {
+          this.models = models;
+          latestData = models.isNotEmpty ? models.last : null;
+          if (latestData != null) {
+            firstName = latestData!.firstName.toString();
+            log("name : $firstName");
+            phoneNumber = latestData!.phoneNumber.toString();
+            log("phone : $phoneNumber");
+            email = latestData!.email.toString();
+            log("email : $email");
+          }
+        });
+      } else {
+        setState(() {
+          this.models = [];
+        });
+      }
     }
   }
 
@@ -146,28 +150,31 @@ class _ToursFormScreenState extends State<ToursFormScreen> {
   // fetch Contactid from database
   Future fetchContactId() async {
     var contactDataModels = await dataModelProvider.fetchContactIdMethod();
-    if (contactDataModels != null) {
-      setState(() {
-        this.contactDataModels = contactDataModels;
-        latestContactIdData =
-            contactDataModels.isNotEmpty ? contactDataModels.last : null;
+    if (mounted) {
+      if (contactDataModels != null) {
+        setState(() {
+          this.contactDataModels = contactDataModels;
+          latestContactIdData =
+              contactDataModels.isNotEmpty ? contactDataModels.last : null;
 
-        if (latestContactIdData != null) {
-          getContact = latestContactIdData!.contactId.toString();
-          log("contactIdFetch in tour : $getContact");
-          contactUserIdFetch = latestContactIdData!.contact_user_Id.toString();
-          log("contactUserIdFetch : $contactUserIdFetch");
-        } else {
-          getContact = " ";
-          contactUserIdFetch = " ";
+          if (latestContactIdData != null) {
+            getContact = latestContactIdData!.contactId.toString();
+            log("contactIdFetch in Tours : $getContact");
+            contactUserIdFetch =
+                latestContactIdData!.contact_user_Id.toString();
+            log("contactUserIdFetch : $contactUserIdFetch");
+          } else {
+            getContact = " ";
+            contactUserIdFetch = " ";
 
-          log("latestContactIdData is null. Setting default values for contactIdFetch and contactUserIdFetch.");
-        }
-      });
-    } else {
-      setState(() {
-        this.contactDataModels = [];
-      });
+            log("latestContactIdData is null. Setting default values for contactIdFetch and contactUserIdFetch.");
+          }
+        });
+      } else {
+        setState(() {
+          this.contactDataModels = [];
+        });
+      }
     }
   }
 

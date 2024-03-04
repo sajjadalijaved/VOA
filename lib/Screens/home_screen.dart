@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       PageRouteBuilder(
                                         transitionsBuilder: (context, animation,
                                             secondaryAnimation, child) {
-                                          var begin = const Offset(0.0, 1.0);
+                                          var begin = const Offset(-1.0, 0.0);
                                           var end = Offset.zero;
                                           var curve = Curves.easeIn;
 
@@ -395,31 +395,31 @@ class _HomeScreenState extends State<HomeScreen>
                     height: height * .08,
                     width: width * .80,
                     press: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          PageRouteBuilder(
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              var begin = const Offset(1.0, 0.0);
-                              var end = Offset.zero;
-                              var curve = Curves.easeIn;
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = const Offset(1.0, 0.0);
+                            var end = Offset.zero;
+                            var curve = Curves.easeIn;
 
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                            transitionDuration: const Duration(seconds: 1),
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return MapScreen(
-                                user_id: widget.userId,
-                              );
-                            },
-                          ),
-                          (route) => false);
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return MapScreen(
+                              user_id: widget.userId,
+                            );
+                          },
+                        ),
+                      );
                     },
                     title: "Connect With Concierge"),
               ),
@@ -447,31 +447,33 @@ class _HomeScreenState extends State<HomeScreen>
                       );
 
                       Future.delayed(const Duration(seconds: 4), () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            PageRouteBuilder(
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                var begin = const Offset(1.0, 0.0);
-                                var end = Offset.zero;
-                                var curve = Curves.easeIn;
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = const Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.easeIn;
 
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-                                return SlideTransition(
-                                  position: animation.drive(tween),
-                                  child: child,
-                                );
-                              },
-                              transitionDuration: const Duration(seconds: 1),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) {
-                                return CheckConnectivityTabsScreen(
-                                  userId: widget.userId,
-                                );
-                              },
-                            ),
-                            (route) => false);
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(seconds: 1),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return CheckConnectivityTabsScreen(
+                                userId: widget.userId,
+                              );
+                            },
+                          ),
+                        ).then((value) {
+                          Navigator.of(context).pop();
+                        });
                       });
                     },
                     title: "Reservation Request"),
@@ -499,31 +501,33 @@ class _HomeScreenState extends State<HomeScreen>
                         },
                       );
                       Future.delayed(const Duration(seconds: 4), () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            PageRouteBuilder(
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                var begin = const Offset(1.0, 0.0);
-                                var end = Offset.zero;
-                                var curve = Curves.easeIn;
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = const Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.easeIn;
 
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-                                return SlideTransition(
-                                  position: animation.drive(tween),
-                                  child: child,
-                                );
-                              },
-                              transitionDuration: const Duration(seconds: 1),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) {
-                                return SpecialRequestScreen(
-                                  userId: widget.userId,
-                                );
-                              },
-                            ),
-                            (route) => false);
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(seconds: 1),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return SpecialRequestScreen(
+                                userId: widget.userId,
+                              );
+                            },
+                          ),
+                        ).then((value) {
+                          Navigator.of(context).pop();
+                        });
                       });
                     },
                     title: "Special Request"),

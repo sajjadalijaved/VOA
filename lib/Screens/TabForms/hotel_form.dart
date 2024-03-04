@@ -89,22 +89,25 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
   // fetch data from database
   Future fetch() async {
     var models = await dataModelProvider.fetchData();
-
-    if (models != null) {
-      setState(() {
-        this.models = models;
-        latestData = models.isNotEmpty ? models.last : null;
-        firstName = latestData!.firstName.toString();
-        log("name : $firstName");
-        phoneNumber = latestData!.phoneNumber.toString();
-        log("phone : $phoneNumber");
-        email = latestData!.email.toString();
-        log("email : $email");
-      });
-    } else {
-      setState(() {
-        this.models = [];
-      });
+    if (mounted) {
+      if (models != null) {
+        setState(() {
+          this.models = models;
+          latestData = models.isNotEmpty ? models.last : null;
+          if (latestData != null) {
+            firstName = latestData!.firstName.toString();
+            log("name : $firstName");
+            phoneNumber = latestData!.phoneNumber.toString();
+            log("phone : $phoneNumber");
+            email = latestData!.email.toString();
+            log("email : $email");
+          }
+        });
+      } else {
+        setState(() {
+          this.models = [];
+        });
+      }
     }
   }
 

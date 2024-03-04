@@ -138,17 +138,32 @@ class _MapScreenState extends State<MapScreen> {
       log("long in MapScreen:${_currentPosition?.longitude.toString() ?? _currentPosition!.longitude.toString()}");
 
       await Future.delayed(const Duration(seconds: 6));
-      Navigator.pushAndRemoveUntil(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => CheckConnectivityCallScreen(
-                  userId: widget.user_id,
-                  lat: _currentPosition?.latitude.toString() ??
-                      _currentPosition!.latitude.toString(),
-                  long: _currentPosition?.longitude.toString() ??
-                      _currentPosition!.longitude.toString(),
-                )),
-        (route) => false,
+        PageRouteBuilder(
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            var begin = const Offset(1.0, 0.0);
+            var end = Offset.zero;
+            var curve = Curves.easeIn;
+
+            var tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(seconds: 1),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return CheckConnectivityCallScreen(
+              userId: widget.user_id,
+              lat: _currentPosition?.latitude.toString() ??
+                  _currentPosition!.latitude.toString(),
+              long: _currentPosition?.longitude.toString() ??
+                  _currentPosition!.longitude.toString(),
+            );
+          },
+        ),
       );
     });
   }
