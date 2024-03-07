@@ -563,7 +563,7 @@ class _AirFairFormScreenState extends State<AirFairFormScreen> {
                     left: size.width * 0.05,
                   ),
                   child: const Text(
-                    "Additional Information (optional)",
+                    "Additional Information (Optional)",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,

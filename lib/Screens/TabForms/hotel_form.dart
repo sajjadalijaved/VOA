@@ -430,7 +430,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   padding: EdgeInsets.only(
                       left: size.width * 0.05, top: size.height * 0.01),
                   child: const Text(
-                    "Address is (optional)",
+                    "Address (Optional)",
                     style: TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
@@ -698,7 +698,7 @@ class _HotelFormScreenState extends State<HotelFormScreen> {
                   padding: EdgeInsets.only(
                       left: size.width * 0.05, top: size.height * 0.01),
                   child: const Text(
-                    "Additional Information (optional)",
+                    "Additional Information (Optional)",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,

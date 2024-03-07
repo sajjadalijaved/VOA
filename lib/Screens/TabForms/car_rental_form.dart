@@ -280,7 +280,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
-                    "Pickup Location",
+                    "PickUp Location",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -299,7 +299,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateLocation(value);
                     },
-                    hintText: "Enter Pickup Location",
+                    hintText: "Enter PickUp Location",
                     fieldValidationkey: pickLocationFieldKey),
                 const SizedBox(
                   height: 8,
@@ -334,7 +334,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                                 color: value.pickDateFieldColor,
                               ),
                               inputAction: TextInputAction.none,
-                              hintText: "Pickup Date",
+                              hintText: "PickUp Date",
                               readonly: true,
                               fieldValidationkey: pickDateFieldKey),
                         ),
@@ -363,7 +363,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                               validate: (value) {
                                 return FieldValidator.validateTime(value);
                               },
-                              hintText: "Pickup Time",
+                              hintText: "PickUp Time",
                               fieldValidationkey: pickTimeFieldKey),
                         ),
                       ),
@@ -376,7 +376,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
-                    "Dropoff Location",
+                    "DropOff Location",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -401,7 +401,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                     validate: (value) {
                       return FieldValidator.validateLocation(value);
                     },
-                    hintText: "Enter Dropoff Location",
+                    hintText: "Enter DropOff Location",
                     focusNode: dropLocation,
                     fieldValidationkey: dropLocationFieldKey),
                 const SizedBox(
@@ -558,7 +558,7 @@ class _CarRentalFormScreenState extends State<CarRentalFormScreen> {
                   padding: EdgeInsets.only(
                       left: size.width * 0.05, top: size.height * 0.01),
                   child: const Text(
-                    "Additional Information (optional)",
+                    "Additional Information (Optional)",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,

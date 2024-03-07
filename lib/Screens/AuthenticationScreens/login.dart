@@ -224,40 +224,42 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Padding(
                       padding: EdgeInsets.only(left: width * .55),
                       child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  var begin = const Offset(1.0, 0.0);
-                                  var end = Offset.zero;
-                                  var curve = Curves.easeIn;
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = const Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeIn;
 
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-                                  return SlideTransition(
-                                    position: animation.drive(tween),
-                                    child: child,
-                                  );
-                                },
-                                transitionDuration: const Duration(seconds: 1),
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return const CheckConnectivityForgetPassword();
-                                },
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            'Forget Password?',
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFF0092ff),
-                                decorationThickness: 2,
-                                color: Color(0xFF0092ff),
-                                fontSize: 16),
-                          )),
+                                var tween = Tween(begin: begin, end: end).chain(
+                                  CurveTween(curve: curve),
+                                );
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                              transitionDuration: const Duration(seconds: 1),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return const CheckConnectivityForgetPassword();
+                              },
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Forget Password?',
+                          style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              decorationColor: Color(0xFF0092ff),
+                              decorationThickness: 2,
+                              color: Color(0xFF0092ff),
+                              fontSize: 16),
+                        ),
+                      ),
                     ),
                   ),
                 ),

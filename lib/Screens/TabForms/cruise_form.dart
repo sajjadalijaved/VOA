@@ -665,7 +665,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                 Padding(
                   padding: EdgeInsets.only(left: size.width * 0.05),
                   child: const Text(
-                    "With/Without (Free at sea)",
+                    "With/WithOut (Free At Sea)",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -784,7 +784,7 @@ class _CruiseFormScreenState extends State<CruiseFormScreen> {
                     left: size.width * 0.05,
                   ),
                   child: const Text(
-                    "Additional Information (optional)",
+                    "Additional Information (Optional)",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
